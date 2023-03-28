@@ -1,0 +1,80 @@
+{% extends "nav.html" %}
+{% block title %}Sign up / Photovolta{% endblock %}
+{% block content %}
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
+<html>
+
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="static/css/main.css" />
+		<noscript><link rel="stylesheet" href="static/css/noscript.css" /></noscript>
+
+	<header id="header">
+			<h1>Registro de Usuario</h1>
+			<p>¡Bienvenido a Photovolta!</p>
+			<style>
+				.error-message {
+					color: rgb(204, 5, 21);
+				}
+			</style>
+			
+	</header>
+	
+	<body >
+	
+		<!-- Wrapper -->	<!-- Content action="procesar_registro.php"--> 
+			
+		<form action="" method="post" > <!--action = atributo action se indica la URL a la que se enviarán los datos del formulario--> 
+				
+			<label for="username">Nombre de name:</label>
+			<input type="text" id="username" name="username" required><br>
+			
+			{% if error_message %}
+            <div class="error-message">{{ error_message }}</div>
+        	{% endif %}
+
+
+			<label for="email">Email:</label>
+			<input type="email" id="email" name="email" required><br>
+	
+			<label for="password">Contraseña:</label>
+			<input type="password" id="password" name="password" required><br>
+	
+			<label for="password_confirm">Confirmar Contraseña:</label>
+			<input type="password" id="password_confirm" name="password_confirm" required><br>
+	
+			<input type="submit" id="send-signup" name="signup" value="Registrar" />
+	
+		</form>
+		<script>
+			var errorMessage = document.querySelector('.error-message');
+			if (errorMessage) {
+				var inputField = errorMessage.previousElementSibling;
+				inputField.classList.add('invalid');
+			}
+		</script>
+
+			<!-- Main -->
+			<style>
+				#main {
+					background-color: #fdfdfd00;
+					color: #636363;
+					border-radius: 0.25em;
+				}
+			</style>
+
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
+
+
+{% endblock %}

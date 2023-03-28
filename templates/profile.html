@@ -1,0 +1,25 @@
+
+{% extends "nav.html" %}
+{% block title %}Profile / Photovolta{% endblock %}
+{% block content %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Perfil de Usuario</title>
+</head>
+<body>
+    <h1>Perfil de Usuario</h1>
+    <p><strong>Nombre de usuario:</strong> {{ username }}</p>
+    <p><strong>Correo electrónico:</strong> {{ email }}</p>
+    <p><strong>Fecha de registro:</strong> {{ date_registered }}</p>
+
+    <form action="{{ url_for('logout') }}" method="post">
+        <button type="submit">Cerrar sesión</button>
+    </form>
+
+</body>
+</html>
+
+{% endblock %}

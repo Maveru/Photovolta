@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
+
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for("static", filename="base.css") }}">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="static/css/main.css" />
+    <noscript><link rel="stylesheet" href="static/css/noscript.css" /></noscript>
+    <style>
+           
+             nav {
+          position: relative;
+            top: auto;
+            
+            right: auto;
+            left: 0;
+            width: 319px;
+            display: table;
+            margin:  auto;
+            transform: translateY(-50%);
+          }
+          
+          nav a {
+            position: relative;
+            width: 33.333%;
+            display: table-cell;
+            text-align: center;
+            color: #ffffff;
+            text-decoration: none; /* Agrega esta línea */
+            
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-weight: bold;
+            padding: 10px 20px;
+            transition: 0.2s ease color;
+          }
+          
+          nav a:before,
+          nav a:after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            transition: 0.2s ease transform;
+            text-decoration: none; /* Agrega esta línea */
+          }
+          
+          nav a:before {
+            top: 0;
+            left: 10px;
+            width: 6px;
+            height: 6px;
+            text-decoration: none; /* Agrega esta línea */
+          }
+          
+          nav a:after {
+            top: 5px;
+            left: 18px;
+            width: 4px;
+            height: 4px;
+            text-decoration: none; /* Agrega esta línea */
+          }
+          
+          nav a:nth-child(1):before {
+            background-color: yellow;
+          }
+          
+          nav a:nth-child(1):after {
+            background-color: red;
+          }
+          
+          nav a:nth-child(2):before {
+            background-color: red;
+          }
+          
+          nav a:nth-child(2):after {
+            background-color: turquoise;
+          }
+          
+          nav a:nth-child(3):before {
+            background-color: turquoise;
+          }
+          
+          nav a:nth-child(3):after {
+            background-color: palevioletred;
+          }
+          nav a:nth-child(4):before {
+            background-color: palevioletred;
+          }
+          nav a:nth-child(4):after {
+            background-color: yellow;
+          }
+          
+          #indicator {
+            position: absolute;
+            left: 5%;
+            bottom: 0;
+            width: 30px;
+            height: 3px;
+            background-color: #fff;
+            border-radius: 5px;
+            transition: 0.2s ease left;
+          }
+          
+          nav a:hover {
+            color: #fff;
+          }
+          
+          nav a:hover:before,
+          nav a:hover:after {
+            transform: scale(1);
+          }
+          
+          nav a:nth-child(1):hover ~ #indicator {
+            background: linear-gradient(130deg, yellow, red);
+          }
+          
+          nav a:nth-child(2):hover ~ #indicator {
+            left: 25%;
+            background: linear-gradient(130deg, red, turquoise);
+          }
+          
+          nav a:nth-child(3):hover ~ #indicator {
+            left: 50%;
+            background: linear-gradient(130deg, turquoise, palevioletred);
+          }
+          nav a:nth-child(4):hover ~ #indicator {
+            left: 80%;
+            background: linear-gradient(130deg, palevioletred, yellow);
+          }</style>
+    </head>
+</head>
+
+                
+    <header id="header">
+        <nav>
+            <a href="/">Inicio</a>
+            <a href="/mapa">Mapa</a>
+            <a href="/feedback">Feedback</a>
+            <a href="/profile">Perfil</a>
+            <div id="indicator"></div>
+          </nav>
+    </header>
+
+<body>
+    
+{% block content %}
+
+
+{% endblock %}
+</body>
+
+
+<footer id="footer">
+						
+    <section>
+            <h2>Etiam feugiat</h2>
+            <dl class="alt">
+                <dt>Address</dt>
+                <dd>1234 Somewhere Road &bull; Nashville, TN 00000 &bull; USA</dd>
+                <dt>Phone</dt>
+                <dd>(000) 000-0000 x 0000</dd>
+                <dt>Email</dt>
+                <dd><a href="#">information@untitled.tld</a></dd>
+            </dl>
+            <ul class="icons">
+                <li><a href="#" class="icon brands fa-twitter alt"><span class="label">Twitter</span></a></li>
+                <li><a href="#" class="icon brands fa-facebook-f alt"><span class="label">Facebook</span></a></li>
+                <li><a href="#" class="icon brands fa-instagram alt"><span class="label">Instagram</span></a></li>
+                <li><a href="#" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
+                <li><a href="#" class="icon brands fa-dribbble alt"><span class="label">Dribbble</span></a></li>
+            </ul>
+        </section>
+        <p class="copyright">&copy; Diseñado con una plantilla de: <a href="https://html5up.net">HTML5 UP</a>.</p>
+</footer>
+
+</html>

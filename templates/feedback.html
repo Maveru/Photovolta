@@ -1,0 +1,42 @@
+
+{% extends "nav.html" %}
+{% block title %}Feedback / Photovolta{% endblock %}
+{% block content %}
+<!DOCTYPE html>
+<style>
+    #comment_text {
+    resize: none;
+    height: 75px; /* Establece la altura fija de la textarea */
+    width: 455px; /* Establece la anchura fija de la textarea */
+  }
+  #boton {
+    resize: none;
+    height: 50px; /* Establece la altura fija de la textarea */
+    width: 75px;  /* Establece la anchura fija de la textarea */
+  }
+</style>
+
+<html>
+<head>
+	<title>Comentarios</title>
+</head>
+<body>
+
+  <main></main>
+	<h2>Comentarios:</h2>
+	{% for comment in comments %}
+  <div>
+    <p>{{ comment['username'] }} - {{ comment['date'] }}</p>
+    <p>{{ comment['comment'] }}</p>
+  </div>
+	{% endfor %}
+  	<h1>Escribe tu comentario:</h1>
+	<form method="POST" action="{{ url_for('comment') }}">
+		<textarea id="comment_text" name="comment" rows="4" cols="50" resize="none" resi></textarea><a></a>
+		<input id="boton" type="submit" value="Enviar">
+        
+	</form>
+</body>
+</html>
+
+{% endblock %}
