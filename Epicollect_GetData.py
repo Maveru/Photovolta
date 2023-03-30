@@ -100,7 +100,7 @@ madrid_coords = [location.latitude, location.longitude]
 madrid_map = folium.Map(location=madrid_coords, zoom_start=6)
 capa_marcadores = folium.FeatureGroup(name='Marcadores',show=False)
 
-
+DatosTabla = {'entradas': []}
 
 # Iterar sobre las entradas e imprimir la fecha y hora de cada una
 for entry in data['entries']:
@@ -119,15 +119,19 @@ for entry in data['entries']:
       #  imagen_array = np.array(Image.open(url))
     # Mostrar la imagenp
    # Image.fromarray(imagen_array).show()    
-    entrada = {"Usuario":user,"Latitud":latitud,"Longitud":longitud,"Fecha":fecha,"Hora":hora,"Analisis":buena_iluminacion_solar(url)} #Diccionario que guarda cada entrada de Epicollect
+    entrada = {"Usuario":user,"Latitud":latitud,"Longitud":longitud,"Fecha":fecha,"Hora":hora,"Analisis":buena_iluminacion_solar(url),"url":url} #Diccionario que guarda cada entrada de Epicollect
     
     mapear(latitud,longitud,buena_iluminacion_solar(url),hora,url) # Crea un marcador para cada ubicacion con el mensaje de si hay buena iluminacion o no
 #Crea un diccionario para cada usuario
+    DatosTabla['entradas'].append(entrada)
+
     if user in entradas_user:
         entradas_user[user].append(entrada)
     else:
         entradas_user[user] = [entrada]
 
+#print(entradas_user)
+print("SEPARADOR------------------------------")
 #Imprime los datos segun el usuario
 for user in sorted(entradas_user.keys()):
     #print("Entradas para el usuario", user,":")

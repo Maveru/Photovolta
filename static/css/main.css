@@ -153,10 +153,10 @@ input, select, textarea {
 
 	body {
 		background-color: #4e8eee;
-		background-image: url("images/overlay.png"), -moz-linear-gradient(45deg, #a6af2b 15%, #1d70ec 85%);
-		background-image: url("images/overlay.png"), -webkit-linear-gradient(45deg, #a6af2b 15%, #1d70ec 85%);
-		background-image: url("images/overlay.png"), -ms-linear-gradient(45deg, #a6af2b 15%, #1d70ec 85%);
-		background-image: url("images/overlay.png"), linear-gradient(45deg, #a6af2b 15%, #1d70ec 85%);
+		background-image: url("images/overlay.png"), -moz-linear-gradient(45deg, #00B894 15%, #0A79DF 85%);
+		background-image: url("images/overlay.png"), -webkit-linear-gradient(45deg, #00B894 15%, #0A79DF 85%);
+		background-image: url("images/overlay.png"), -ms-linear-gradient(45deg, #00B894 15%, #0A79DF 85%);
+		background-image: url("images/overlay.png"), linear-gradient(45deg, #00B894 15%, #0A79DF 85%);
 	}
 
 		body.is-preload *, body.is-preload *:before, body.is-preload *:after {
@@ -3745,7 +3745,11 @@ input, select, textarea {
 /* Footer */
 
 	#footer {
-		display: -moz-flex;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+		text-align: center;
 		display: -webkit-flex;
 		display: -ms-flex;
 		display: flex;
@@ -3756,7 +3760,13 @@ input, select, textarea {
 		padding: 5em 5em 3em 5em ;
 		width: calc(100% + 2em);
 		margin: 0 0 3em -2em;
+		color:black
+		
 	}
+		#footer-text{
+		font-size: 14px;
+      	color: #000000;
+		}
 
 		#footer > * {
 			width: calc(50% - 2em);

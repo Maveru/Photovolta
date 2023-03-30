@@ -6,6 +6,8 @@ from forms import SignupForm,PostForm
 from werkzeug.security import check_password_hash,generate_password_hash
 from flask_session import Session
 from datetime import datetime
+from Epicollect_GetData import DatosTabla
+from jinja2 import Environment
 
 app = Flask(__name__)
 app.secret_key = "clave_secreta"
@@ -31,7 +33,14 @@ def mapeao():
 
 @app.route('/datos')
 def data():
-    return render_template('datos.html')
+    
+    return render_template('datos.html', DatosTabla=DatosTabla)
+
+@app.route('/data')
+def datos():
+    
+    return DatosTabla
+
 
 users= {}
 
@@ -133,17 +142,6 @@ def perfil():
     else:
         # Si el usuario no ha iniciado sesión, redirigir a la página de inicio de sesión
         return redirect(url_for('login'))
-
-
-
-
-
-
-
-
-
-
-
 
 
 
