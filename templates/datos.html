@@ -33,15 +33,15 @@
       </tr>
     </thead>
     <tbody>
-      {% for entrada in DatosTabla.entradas %}
+      {% for entrada in DatosTabla %}
       <tr>
-        <td>{{ entrada['Usuario'] }}</td>
-        <td>{{ entrada['Latitud'] }}</td>
-        <td>{{ entrada['Longitud'] }}</td>
-        <td>{{ entrada['Fecha'] }}</td>
-        <td>{{ entrada['Hora'] }}</td>
-        <td>{{ entrada['Analisis'] }}</td>
-        <td><img src="{{ entrada['url'] }}"  width="100" height="100" alt="Imagen"></td>
+        <td>{{ entrada.username }}</td>
+        <td>{{ entrada.latitud}}</td>
+        <td>{{ entrada.longitud }}</td>
+        <td>{{ entrada.fecha }}</td>
+        <td>{{ entrada.hora }}</td>
+        <td>{{ entrada.analisis }}</td>
+        <td><img src="{{ entrada.url }}"  width="100" height="100" alt="Imagen"></td>
       </tr>
       {% endfor %}
     </tbody>

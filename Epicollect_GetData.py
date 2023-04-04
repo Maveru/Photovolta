@@ -20,7 +20,11 @@ from folium.plugins import HeatMap, MiniMap, MousePosition
 
 import base64
 
+from models import DatoTabla
+import db
+import sys
 
+db.Base.metadata.create_all(db.engine)
 pp = pprint.PrettyPrinter(indent=2)
 
 def buena_iluminacion_solar(imagen_url, umbral=150):
@@ -89,10 +93,6 @@ entries = pyep.api.get_entries(TEST_SLUG, token['access_token'])
 
 data = entries['data']
 
-entradas_user = {}
-longitudes = []
-latitudes = []
-
 #Se crea el mapa
 geolocator = Nominatim(user_agent="Photovolta")
 location = geolocator.geocode("Madrid, Spain")
@@ -100,8 +100,13 @@ madrid_coords = [location.latitude, location.longitude]
 madrid_map = folium.Map(location=madrid_coords, zoom_start=6)
 capa_marcadores = folium.FeatureGroup(name='Marcadores',show=False)
 
-DatosTabla = {'entradas': []}
+bool = 1
 
+Database =  db.session.query(DatoTabla).all()
+
+flag = 0
+
+print("holabucle")
 # Iterar sobre las entradas e imprimir la fecha y hora de cada una
 for entry in data['entries']:
     user = entry['user']
@@ -110,53 +115,59 @@ for entry in data['entries']:
     fecha = entry['fecha']
     hora = entry['hora']
     url = entry['fotografia']
-    
-    # Definir la URL de la imagen
-
-    #webbrowser.open(url)
-    # Abrir la URL y leer su contenido
-    #with urllib.request.urlopen(url) as url:
-      #  imagen_array = np.array(Image.open(url))
-    # Mostrar la imagenp
-   # Image.fromarray(imagen_array).show()    
+   
     entrada = {"Usuario":user,"Latitud":latitud,"Longitud":longitud,"Fecha":fecha,"Hora":hora,"Analisis":buena_iluminacion_solar(url),"url":url} #Diccionario que guarda cada entrada de Epicollect
-    
-    mapear(latitud,longitud,buena_iluminacion_solar(url),hora,url) # Crea un marcador para cada ubicacion con el mensaje de si hay buena iluminacion o no
-#Crea un diccionario para cada usuario
-    DatosTabla['entradas'].append(entrada)
 
-    if user in entradas_user:
-        entradas_user[user].append(entrada)
-    else:
-        entradas_user[user] = [entrada]
+#Crea un diccionario para cada usuario
+    Dato = DatoTabla(user,latitud,longitud,fecha,hora,buena_iluminacion_solar(url),url)
+    
+    
+
+    for entry in Database:
+        flag = flag + 1
+        if entry.url == url:
+            print("HAY QUE SALIR SOOOOOOOOOOOS")
+            bool = 0
+            break
+    print(flag)
+    if flag < db.session.query(DatoTabla).count():
+            print("ADIOS AL SISTEMA ")
+            sys.exit()
+    if bool == 0:
+        print("YO ME PIRO DE AQUI ")
+        break
+   
+
+
+    print("Sigues en el bucle")    
+
+    #mapear(latitud,longitud,buena_iluminacion_solar(url),hora,url) # Crea un marcador para cada ubicacion con el mensaje de si hay buena iluminacion o no
+
+    db.session.add(Dato)
+    db.session.commit()
 
 #print(entradas_user)
-print("SEPARADOR------------------------------")
+print("------------------------------LOADING------------------------------")
 #Imprime los datos segun el usuario
-for user in sorted(entradas_user.keys()):
-    #print("Entradas para el usuario", user,":")
-    for entrada in entradas_user[user]:
-        entradas_sin_user = dict(list(entrada.items())[1:]) #Quita la entrada "user"
-        #print(entradas_sin_user)
-        #print(entrada)
-        #print(" ".join("{}: {}".format(k, v) for k, v in entradas_sin_user.items())) #Para imprimir sin {} ni ,
 
-
+print(flag)
 
 # Crear una lista vacía para almacenar los datos de latitud y longitud
 lista_lat_lon = []
 
+#db.session.commit()
+
+
 # Iterar sobre las entradas de cada usuario y extraer los valores de latitud y longitud
-for usuario, entradas in entradas_user.items():
-    for entrada in entradas:
-        latitud  = entrada["Latitud"]
-        longitud = entrada["Longitud"]
-        valor    = 10
+
+for entrada in db.session.query(DatoTabla).all():
+    mapear(entrada.latitud,entrada.longitud,entrada.analisis,entrada.hora,entrada.url)
+    #valor    = 10
+    lista_lat_lon.append((entrada.latitud, entrada.longitud)) # Añadir los valores a la lista como una tupla
         
-        lista_lat_lon.append((latitud, longitud)) # Añadir los valores a la lista como una tupla
 
 #input('Presione cualquier tecla para salir...')
-datos = []
+
 
 mapa_calor = HeatMap(data=lista_lat_lon,name = 'Heat Map', radius=10)
 mapa_calor.add_to(madrid_map)

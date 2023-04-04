@@ -24,10 +24,10 @@
 
   <main></main>
 	<h2>Comentarios:</h2>
-	{% for comment in comments %}
+	{% for comentario in comentarios %}
   <div>
-    <p>{{ comment['username'] }} - {{ comment['date'] }}</p>
-    <p>{{ comment['comment'] }}</p>
+    <p>{{ comentario.username}} - {{ comentario.date }}</p>
+    <p>{{ comentario.comment}}</p>
   </div>
 	{% endfor %}
   	<h1>Escribe tu comentario:</h1>
