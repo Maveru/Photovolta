@@ -1,0 +1,175 @@
+<style>
+    html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #292929;
+  overflow: hidden;
+}
+
+nav {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  width: 319px;
+  display: table;
+  margin: 0 auto;
+  transform: translateY(-50%);
+}
+
+nav a {
+  position: relative;
+  width: 33.333%;
+  display: table-cell;
+  text-align: center;
+  color: #949494;
+  text-decoration: none;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: bold;
+  padding: 10px 20px;
+  transition: 0.2s ease color;
+}
+
+nav a:before,
+nav a:after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  transition: 0.2s ease transform;
+}
+
+nav a:before {
+  top: 0;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+}
+
+nav a:after {
+  top: 5px;
+  left: 18px;
+  width: 4px;
+  height: 4px;
+}
+    
+    nav a:nth-child(1):before {
+      background-color: yellow;
+    }
+    
+    nav a:nth-child(1):after {
+      background-color: red;
+    }
+    
+    nav a:nth-child(2):before {
+      background-color: #00e2ff;
+    }
+    
+    nav a:nth-child(2):after {
+      background-color: #89ff00;
+    }
+    
+    nav a:nth-child(3):before {
+      background-color: purple;
+    }
+    
+    nav a:nth-child(3):after {
+      background-color: palevioletred;
+    }
+nav a:nth-child(4):before {
+  background-color: #ffa200;
+}
+
+nav a:nth-child(4):after {
+  background-color: #d400ff;
+}
+
+nav a:nth-child(5):before {
+  background-color: #00ff89;
+}
+
+nav a:nth-child(5):after {
+  background-color: #ff009b;
+}
+
+nav a:nth-child(6):before {
+  background-color: #7c00ff;
+}
+
+nav a:nth-child(6):after {
+  background-color: #ff1a00;
+}
+
+
+    
+    #indicator {
+        position: absolute;
+        left: 5%;
+        bottom: 0;
+        width: 30px;
+        height: 3px;
+        background-color: #fff;
+        border-radius: 5px;
+        transition: 0.2s ease left;
+    }
+    
+    nav a:hover {
+      color: #fff;
+    }
+    
+    nav a:hover:before,
+    nav a:hover:after {
+      transform: scale(1);
+    }
+    
+    nav a:nth-child(1):hover ~ #indicator {
+      left: 5%;
+      width: 40px;
+      background: linear-gradient(130deg, yellow, red);
+    }
+    
+    nav a:nth-child(2):hover ~ #indicator {
+      left: 18%;
+      width: 40px;
+      background: linear-gradient(130deg, #00e2ff, #89ff00);
+    }
+    
+    nav a:nth-child(3):hover ~ #indicator {
+      left: 33%;
+      width: 65px;
+      background: linear-gradient(130deg, purple, palevioletred);
+    }
+    
+    nav a:nth-child(4):hover ~ #indicator {
+      left: 52%;
+      width: 40px;
+      background: linear-gradient(130deg, #00e2ff, #89ff00);
+    }
+    
+    nav a:nth-child(5):hover ~ #indicator {
+      left: 67%;
+      width: 90px;
+      background: linear-gradient(130deg, purple, palevioletred);
+    }
+    nav a:nth-child(6):hover ~ #indicator {
+        left: 90%;
+        width: 40px;
+        background: linear-gradient(130deg, #7c00ff, #ff1a00);
+    }
+
+    </style>
+    
+    <nav>
+      <a href="/">Inicio</a>
+      <a href="/mapa">Mapa</a>
+      <a href="/feedback">Feedback</a>
+      <a href="/datos">Datos</a>
+      <a href="/leaderboard">Clasificación</a>
+      <a href="/profile">Perfil</a>
+      <div id="indicator"></div>
+    </nav>
+    

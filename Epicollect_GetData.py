@@ -58,10 +58,17 @@ def buena_iluminacion_solar(imagen_url, umbral=150):
 
 def mapear(long,latt,mensaje,texto,url):
 
-    if "Hay Buena iluminacion" in mensaje:
+    """if "Hay Buena iluminacion" in mensaje:
         color = 'green'
     else:  
+        color = 'red'"""
+    if mensaje > 8:
+        color = 'green'
+    elif mensaje > 5:
+        color = 'orange'
+    else:
         color = 'red'
+    
 
     imagen_respuesta = requests.get(url)
     imagen_base64 = base64.b64encode(imagen_respuesta.content).decode()
@@ -73,6 +80,39 @@ def mapear(long,latt,mensaje,texto,url):
 
     marcador.add_to(capa_marcadores)
 
+
+
+
+def analyze_image(url):
+    # Descarga la imagen desde la URL
+    with urllib.request.urlopen(url) as url_response:
+        s = url_response.read()
+    arr = np.asarray(bytearray(s), dtype=np.uint8)
+    img = cv2.imdecode(arr, -1)
+    
+    # Convierte la imagen a escala de grises
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # Crea un detector de bordes Canny
+    edges = cv2.Canny(gray, 100, 200)
+    
+    # Aplica una transformación de Hough para detectar líneas
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
+    
+    # Si se detectan líneas, es una imagen de suelo
+    if lines is not None:
+        # Calcula la puntuación en función de la uniformidad de la iluminación
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+        laplacian = cv2.Laplacian(blur, cv2.CV_64F)
+        variance = np.var(laplacian)
+        score = max(0, min(10, (variance - 20) / 10 + 5))
+        return round(score, 2)
+    
+    # Si no se detectan líneas, no es una imagen de suelo
+    else:
+        return 0
+    
 
 #Para poder sacar los datos de Epicollect
 TEST_CLIENT_ID = 3747
@@ -116,10 +156,10 @@ for entry in data['entries']:
     hora = entry['hora']
     url = entry['fotografia']
    
-    entrada = {"Usuario":user,"Latitud":latitud,"Longitud":longitud,"Fecha":fecha,"Hora":hora,"Analisis":buena_iluminacion_solar(url),"url":url} #Diccionario que guarda cada entrada de Epicollect
+    entrada = {"Usuario":user,"Latitud":latitud,"Longitud":longitud,"Fecha":fecha,"Hora":hora,"Analisis":analyze_image(url),"url":url} #Diccionario que guarda cada entrada de Epicollect
 
-#Crea un diccionario para cada usuario
-    Dato = DatoTabla(user,latitud,longitud,fecha,hora,buena_iluminacion_solar(url),url)
+    #Crea un diccionario para cada usuario
+    Dato = DatoTabla(user,latitud,longitud,fecha,hora,analyze_image(url),url)
     
     
 
@@ -137,7 +177,7 @@ for entry in data['entries']:
         print("YO ME PIRO DE AQUI ")
         break
    
-
+    #print(detect_ground(url))
 
     print("Sigues en el bucle")    
 

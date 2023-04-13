@@ -1,6 +1,6 @@
 
 {% extends "nav.html" %}
-{% block title %}Profile / Photovolta{% endblock %}
+{% block title %}Perfil / Photovolta{% endblock %}
 {% block content %}
 
 
@@ -9,15 +9,29 @@
 <head>
     <title>Perfil de Usuario</title>
 </head>
+<head>
+    <script>
+      function confirmDelete() {
+         if (confirm("¿Estás seguro de que quieres eliminar tu cuenta? Se borrarán todos tus comentarios y perderás tus puntos")) {
+            document.querySelector("#delete-account-form").submit();
+        }
+     }
+    </script>
+  </head>
+  
 <body>
     <h1>Perfil de Usuario</h1>
     <p><strong>Nombre de usuario:</strong> {{ username }}</p>
     <p><strong>Correo electrónico:</strong> {{ email }}</p>
-    <p><strong>Fecha de registro:</strong> {{ date_registered }}</p>
+    <p><strong>Puntuación actual:</strong> {{ score }} puntos</p>
 
     <form action="{{ url_for('logout') }}" method="post">
         <button type="submit">Cerrar sesión</button>
     </form>
+    <form id="delete-account-form" action="{{ url_for('deleteProfile') }}" method="post">
+        <button type="button" onclick="confirmDelete()">Eliminar cuenta</button>
+    </form>
+      
 
 </body>
 </html>

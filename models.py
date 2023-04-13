@@ -9,13 +9,15 @@ class User(db.Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String(15), nullable=False)
-    email = Column(String(50), nullable=False)
+    email = Column(String(80), nullable=False)
     password = Column(String(50), nullable=False)
+    score = Column(Float, nullable=False)
 
     def __init__(self, username, email,password):
         self.username = username
         self.email = email
         self.password = password
+        self.score = 0
 
     def __repr__(self):
         return f"<User {self.id}>"
@@ -47,7 +49,7 @@ class DatoTabla(db.Base):
     longitud = Column(Float, nullable=False)
     fecha = Column(String(20), nullable=False)
     hora = Column(String(20), nullable=False)
-    analisis = Column(String(50), nullable=False)
+    analisis = Column(Float, nullable=False)
     url = Column(String(200), nullable=False)
 
     def __init__(self, username, latitud,longitud,fecha,hora,analisis,url):

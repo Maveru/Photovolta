@@ -1,0 +1,40 @@
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<link rel="stylesheet" href="static/css/main.css" />
+<noscript><link rel="stylesheet" href="static/css/noscript.css" /></noscript>
+
+{% extends "nav.html" %}
+{% block title %}Leaderboard / Photovolta{% endblock %}
+{% block content %}
+
+<style>
+    .centered {
+      margin: auto;
+      width: 10%;
+      text-align: center;
+    }
+   
+    
+  </style>
+
+<table class ="centered">
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Puntuación</th>
+     
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in Users %}
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.score}}</td>
+        
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  {% endblock %}

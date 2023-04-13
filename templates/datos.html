@@ -5,43 +5,48 @@
 <noscript><link rel="stylesheet" href="static/css/noscript.css" /></noscript>
 
 {% extends "nav.html" %}
-{% block title %}Profile / Photovolta{% endblock %}
+{% block title %}Datos / Photovolta{% endblock %}
 {% block content %}
 
 <style>
     .centered {
-      margin: auto;
-      width: 70%;
-      text-align: center;
+      margin:  auto;
+      width: 90%;
+      
     }
     td {
         vertical-align:middle;
+        
     }
+
+ 
+    
     
   </style>
 
 <table class ="centered">
     <thead>
       <tr>
-        <th>Usuario</th>
+        <!--<th>Usuario</th>-->
+        <th>{% for i in range(6) %}&nbsp;{% endfor %}Fecha</th>
+        <th>Hora</th>
         <th>Latitud</th>
         <th>Longitud</th>
-        <th>Fecha</th>
-        <th>Hora</th>
-        <th>Análisis</th>
+        <th>Puntuación</th>
         <th>Imagen</th>
       </tr>
     </thead>
     <tbody>
       {% for entrada in DatosTabla %}
       <tr>
-        <td>{{ entrada.username }}</td>
-        <td>{{ entrada.latitud}}</td>
-        <td>{{ entrada.longitud }}</td>
+        <!--<td>{{ entrada.username }}</td>-->
         <td>{{ entrada.fecha }}</td>
         <td>{{ entrada.hora }}</td>
-        <td>{{ entrada.analisis }}</td>
-        <td><img src="{{ entrada.url }}"  width="100" height="100" alt="Imagen"></td>
+        <td>{{ entrada.latitud}}</td>
+        <td>{{ entrada.longitud }}</td>
+        <td>{% for i in range(6) %}&nbsp;{% endfor %}{{ entrada.analisis }}</td>
+        <td><a href="{{ entrada.url }}" target="_blank"><img src="{{ entrada.url }}" width="100" height="100" alt="Imagen"></a></td>
+
       </tr>
       {% endfor %}
     </tbody>

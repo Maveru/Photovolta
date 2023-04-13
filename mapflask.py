@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,session
+from flask import Flask, render_template,request,redirect,url_for,session,flash
 import folium
 import subprocess
 import os
@@ -10,8 +10,7 @@ from jinja2 import Environment
 
 import db
 from models import Comment,User,DatoTabla
-
-
+from sqlalchemy import func
 app = Flask(__name__)
 app.secret_key = "clave_secreta"
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -20,7 +19,23 @@ Session(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    Nusuarios = db.session.query(User).count()#No se si pasar los registrados en la pagina o los que han mandado datos a Epicollect
+   
+    Ndatos = db.session.query(DatoTabla).count()
+
+    users = db.session.query(User).all()
+    score_total = 0
+    
+    datosPuntos = db.session.query(DatoTabla.analisis).all()
+    
+    for punto in datosPuntos:
+            score_total += punto[0]
+            print(score_total)
+
+    
+
+
+    return render_template('index.html',Nusuarios=Nusuarios,Ndatos=Ndatos,score_total=round(score_total,2))
 
 @app.route('/mapa')
 def mapa():
@@ -36,8 +51,29 @@ def mapeao():
 
 @app.route('/datos')
 def data():
-    DatosTabla = db.session.query(DatoTabla).all()
+    #DatosTabla = db.session.query(DatoTabla).order_by(func.substr(DatoTabla.fecha, 6, 2) + '-' + func.substr(DatoTabla.fecha, 9, 2)).all()
+    DatosTabla = db.session.query(DatoTabla).order_by(DatoTabla.analisis.desc()).all()
     return render_template('datos.html', DatosTabla=DatosTabla)
+
+
+@app.route('/leaderboard')
+def leaderboard():
+       
+    users = db.session.query(User).all()
+    
+    for user in users:
+        email = user.email
+        
+        datosPuntos = db.session.query(DatoTabla).filter_by(username=email).all()
+        user.score = 0
+        for punto in datosPuntos:
+            user.score += punto.analisis
+            user.score = round(user.score, 2)
+
+
+
+    Users = db.session.query(User).order_by(User.score.desc()).all() #ordena los usuarios de mayor a menor puntuacion
+    return render_template('leaderboard.html', Users=Users)
 
 
 
@@ -46,7 +82,11 @@ users= {}
 comments = []
 
 
+#poner una tabla que solo muestre los usuarios sus puntos e insignias/
 
+#user_id = request.args.get('user_id') # Obtener el id del usuario desde la consulta de la URL
+ #               user = db.session.query(User).first() # Buscar al usuario por su id
+  #              user.score += 1 # Aumentar la puntuación del usuario en 1
 
 
 # Definimos una ruta para procesar el formulario
@@ -64,6 +104,7 @@ def comment():
                 comments.append({'username': session['username'], 'comment': comment, 'date': dt_string})
                 hola = Comment(session['username'], comment, dt_string)
                 db.session.add(hola)
+                
                 db.session.commit()
             return redirect(url_for('comment'))
             
@@ -164,6 +205,25 @@ def login():
     else:
         return render_template('login.html')
 
+@app.route('/profile/delete',methods=['POST'])
+def deleteProfile():
+
+    username = session['username']
+    
+
+    user = db.session.query(User).filter_by(username=username).first()
+    print(f"Deleting user with username {user.username}")
+    db.session.delete(user)
+
+    comments = db.session.query(Comment).filter_by(username=username).all()
+    for comment in comments:
+        db.session.delete(comment)
+
+
+    db.session.commit()
+    session.clear()
+    return redirect(url_for('login'))
+
 @app.route('/logout',methods=['POST'])
 def logout():
     session.clear()
@@ -172,7 +232,7 @@ def logout():
 
 @app.route('/test')
 def test():
-    return(users)
+   return render_template('test.html')
 
 
 from flask import render_template, session, redirect, url_for
@@ -185,22 +245,26 @@ def perfil():
        
         user = db.session.query(User).filter_by(username=username).first()
         email = user.email
+      
+        datosPuntos = db.session.query(DatoTabla).filter_by(username=email).all()
+        user.score = 0
+        for punto in datosPuntos:
+            print(user.score)
+            print(punto.analisis)
+            user.score = user.score + punto.analisis   
+       
+        score = user.score
+        db.session.commit()   
+        
         #date_registered = session['date_registered']
 
-        # Pasar los datos del usuario a la plantilla , date_registered=date_registered
-        return render_template('profile.html', username=username, email=email)
+        # Pasar los datos del usuario a la plantilla
+        return render_template('profile.html', username=username, email=email,score=score)
     else:
         # Si el usuario no ha iniciado sesión, redirigir a la página de inicio de sesión
         return redirect(url_for('login'))
 
 
-
-
-#def run():
-#    hola = Comment('Juan','Que locura HERMANO LOOOOOOOL ;)')
-#    db.session.add(hola)
-#    db.session.commit()
-    
 
 if __name__ == '__main__':
     db.Base.metadata.create_all(db.engine)
