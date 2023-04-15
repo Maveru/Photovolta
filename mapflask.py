@@ -1,16 +1,20 @@
 from flask import Flask, render_template,request,redirect,url_for,session,flash
-import folium
-import subprocess
-import os
-from werkzeug.security import check_password_hash,generate_password_hash
+#import folium
+#import subprocess
+#import os
+#from werkzeug.security import check_password_hash,generate_password_hash
 from flask_session import Session
 from datetime import datetime
 #from Epicollect_GetData import DatosTabla
-from jinja2 import Environment
+#from jinja2 import Environment
+
+from Epicollect_GetData import Epicollect_GetData,MakeMap
 
 import db
 from models import Comment,User,DatoTabla
-from sqlalchemy import func
+#from sqlalchemy import func
+
+
 app = Flask(__name__)
 app.secret_key = "clave_secreta"
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -39,18 +43,19 @@ def index():
 
 @app.route('/mapa')
 def mapa():
-    os.system('python Epicollect_GetData.py') # Agregar la llamada a tu programa aquí
-    
-    
+    #os.system('python Epicollect_GetData.py') 
+    Epicollect_GetData()
+    #Agregar codigo
     return render_template('mapa.html')
 @app.route('/mapeado')
 def mapeao():
-    #os.system('python Epicollect_GetData.py') # Agregar la llamada a tu programa aquí
+    #os.system('python Epicollect_GetData.py') 
     
     return render_template('madrid_map.html')
 
 @app.route('/datos')
 def data():
+    Epicollect_GetData()
     #DatosTabla = db.session.query(DatoTabla).order_by(func.substr(DatoTabla.fecha, 6, 2) + '-' + func.substr(DatoTabla.fecha, 9, 2)).all()
     DatosTabla = db.session.query(DatoTabla).order_by(DatoTabla.analisis.desc()).all()
     return render_template('datos.html', DatosTabla=DatosTabla)
@@ -58,6 +63,7 @@ def data():
 
 @app.route('/leaderboard')
 def leaderboard():
+    Epicollect_GetData()
        
     users = db.session.query(User).all()
     
@@ -95,7 +101,10 @@ def comment():
     comentarios = db.session.query(Comment).all()
    
     if 'username' in session:
-        comentarios = db.session.query(Comment).all()
+        #comentarios = db.session.query(Comment).order_by(func.substr(Comment.date, 6, 2) + '-' + func.substr(Comment.date, 9, 2)).all()
+        comentarios = db.session.query(Comment).order_by(Comment.date.desc()).all()
+
+       
         if request.method == 'POST':
             comment = request.form['comment'].strip() # Elimina los espacios en blanco al principio y al final del comentario
             if comment and not comment.isspace(): # Verifica si el comentario no está vacío y no consiste solo en espacios en blanco
@@ -193,7 +202,7 @@ def login():
         print(session['username'])
 
 
-        return redirect(url_for('comment'))
+        return redirect(url_for('perfil'))
 
 
         if username in users and users[username]['contraseña'] == password:
@@ -239,6 +248,7 @@ from flask import render_template, session, redirect, url_for
 
 @app.route('/profile')
 def perfil():
+    Epicollect_GetData()
     if 'username' in session:
         # Obtener los datos del usuario de la sesión
         username = session['username']
