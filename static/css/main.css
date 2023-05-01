@@ -49,6 +49,8 @@ iframe {
   }
   
 input[type="text"],
+input[type="number"],
+input[type="file"],
 input[type="email"],
 input[type="password"] {
   display: block;
@@ -58,6 +60,18 @@ input[type="password"] {
   border: 2px solid #ccc;
   border-radius: 5px;
 }
+
+input[type="time"],
+input[type="date"]{
+	display:block;
+	width: 35%;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 2px solid #ccc;
+	border-radius: 5px;
+}
+
+
 
 input[type="submit"] {
   background-color: #4CAF50;
@@ -2063,6 +2077,7 @@ input, select, textarea {
 	}
 
 	input[type="text"],
+	input[type="date"]
 	input[type="password"],
 	input[type="email"],
 	select,
@@ -2107,6 +2122,7 @@ input, select, textarea {
 		}
 
 	input[type="text"],
+	input[type="date"]
 	input[type="password"],
 	input[type="email"],
 	select {
@@ -2207,6 +2223,9 @@ input, select, textarea {
 	}
 
 	input[type="text"],
+	input[type="date"],
+	input[type="time"],
+	input[type="number"],
 	input[type="password"],
 	input[type="email"],
 	select,
@@ -2216,6 +2235,7 @@ input, select, textarea {
 	}
 
 		input[type="text"]:focus,
+		input[type="date"]:focus
 		input[type="password"]:focus,
 		input[type="email"]:focus,
 		select:focus,
@@ -3149,7 +3169,7 @@ input, select, textarea {
 		}
 
 		#header.alt {
-			padding: 7em 5em 4em 5em ;
+			padding: -10em 5em 4em 5em ;
 		}
 
 			#header.alt h1 {
@@ -3178,7 +3198,7 @@ input, select, textarea {
 				-ms-transition-delay: 0s;
 				transition-delay: 0s;
 				display: block;
-				margin: 0 0 1.5em 0;
+				margin: -3em 0 1.5em 0;
 			}
 
 				#header.alt .logo img {
@@ -3510,6 +3530,8 @@ input, select, textarea {
 		#main input[type="text"],
 		#main input[type="password"],
 		#main input[type="email"],
+		#main input[type="date"]
+		#main input[type="number"]
 		#main select,
 		#main textarea {
 			background-color: rgba(222, 222, 222, 0.25);

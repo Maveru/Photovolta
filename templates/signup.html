@@ -5,20 +5,34 @@
 <html>
 
 	
-
+<style>
+	ayuda {
+		background-color: #fdfdfd00;
+		color: #636363;
+		border-radius: 0.25em;
+	}
+</style>
 	<header id="header">
 			<h1>Registro de Usuario</h1>
 			<p>¡Bienvenido a Photovolta!</p>
 			<style>
 				.error-message {
-					color: rgb(204, 5, 21);
-				}
+					color: #d8000c; /* color rojo oscuro */
+					background-color: #ffd2d2; /* color de fondo rosa claro */
+					border: 1px solid #d8000c; /* borde rojo oscuro */
+					padding: 10px; /* espacio interior */
+					margin-bottom: 10px; /* margen inferior */
+					border-radius: 5px; /* bordes redondeados */
+					font-size: 16px; /* tamaño de fuente */
+					font-weight: bold; /* texto en negrita */
+					}
+
 			</style>
 			
 	</header>
 	
 	<body >
-	
+		<div id="ayuda">
 		<!-- Wrapper -->	<!-- Content action="procesar_registro.php"--> 
 			
 		<form action="" method="post" > <!--action = atributo action se indica la URL a la que se enviarán los datos del formulario--> 
@@ -26,9 +40,7 @@
 			<label for="username">Nombre de usuario:</label>
 			<input type="text" id="username" name="username" required><br>
 			
-			{% if error_message %}
-            <div class="error-message">{{ error_message }}</div>
-        	{% endif %}
+			
 
 
 			<label for="email">Email:</label>
@@ -39,10 +51,13 @@
 	
 			<label for="password_confirm">Confirmar Contraseña:</label>
 			<input type="password" id="password_confirm" name="password_confirm" required><br>
-	
+			{% if error_message %}
+            <div class="error-message">{{ error_message }}</div>
+        	{% endif %}
 			<input type="submit" id="send-signup" name="signup" value="Registrar" />
 	
 		</form>
+		</div>
 		<script>
 			var errorMessage = document.querySelector('.error-message');
 			if (errorMessage) {

@@ -13,28 +13,83 @@
       margin: auto;
       width: 10%;
       text-align: center;
+      color:rgb(255, 255, 255);
     }
-   
+    .score-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.score-table th,
+.score-table td {
+  box-shadow: 0 0 3px #23d3da;
+  padding: 10px;
+  text-align: center;
+  border: 2px transparent #5192db;
+  color: black;
+
+}
+
+.score-table th {
+  background-color: #9ae7cc57;
+  font-weight: bold;
+
+  
+}
+
+#wrapper2 {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        color:black;
+        border-color: #ddd;
+        border-radius: 10px;
+        border-width: 2px;
+        background-color: #ffffff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+      .title{
+        color: rgb(17, 17, 17);
+        text-align: center;
+        font-size: 36px;
+        text-decoration: dashed;
+        letter-spacing: 0.1em;
+        
+        text-shadow: 2px 2px 4px rgba(98, 228, 245, 0.4);
+
+ 
+      }
     
   </style>
 
-<table class ="centered">
-    <thead>
-      <tr>
-        <th>Usuario</th>
-        <th>Puntuación</th>
-     
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in Users %}
-      <tr>
-        <td>{{ user.username }}</td>
-        <td>{{ user.score}}</td>
-        
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+
   
+
+
+  <body><title>Clasificación</title>
+    <div id="wrapper2">
+      <h1 class="title">Clasificación</h1>
+      <table class ="score-table centered">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Puntuación</th>
+         
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in Users %}
+          <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.score}}</td>
+            
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
   {% endblock %}

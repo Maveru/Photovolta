@@ -3,50 +3,108 @@
 {% block title %}Feedback / Photovolta{% endblock %}
 {% block content %}
 <!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    
+    <style>
+   
+      #wrapper2 {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 2%;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
 
+   
 
-<style>
-    #comment_text {
-    resize: none;
-    height: 75px; /* Establece la altura fija de la textarea */
-    width: 455px; /* Establece la anchura fija de la textarea */
-  }
-  #boton {
-    resize: none;
-    height: 50px; /* Establece la altura fija de la textarea */
-    width: 75px;  /* Establece la anchura fija de la textarea */
-  }
+      textarea {
+        width: 100%;
+        height: 100px;
+        padding: 10px;
+        font-size: 16px;
+        font-family: Arial, sans-serif;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        resize: none;
+        color: black;
+        box-sizing: border-box;
+      }
 
-  h1,p {
-  
-    font-weight: 300;
-		line-height: 1.5;
-		margin: 0 0 0.7em 0;
-		letter-spacing: -0.025em;
-}
-</style>
-
-<html>
-<head>
-	<title>Comentarios</title>
-</head>
-<body>
-
-  <main></main>
-	<h2>Comentarios:</h2>
-	{% for comentario in comentarios %}
-  <div>
-    <p>{{ comentario.username}} - {{ comentario.date }}</p>
-    <p>{{ comentario.comment}}</p>
-  </div>
-	{% endfor %}
-  	<h1>Escribe tu comentario:</h1>
-	<form method="POST" action="{{ url_for('comment') }}">
-		<textarea id="comment_text" name="comment" rows="4" cols="50" resize="none" resi></textarea><a></a>
-		<input id="boton" type="submit" value="Enviar">
+      input[type="submit"] {
+        display: block;
+        width: 150px;
+        height: 40px;
+        margin-top: 20px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1b308ae8;
+        background-color: #44afcf;
+        border: none;
+        border-radius: 4px;
         
-	</form>
-</body>
+        
+      }
+
+      .comment {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f8f8f8;
+        color: black
+      }
+
+      .comment p {
+        margin-bottom: 5px;
+      }
+
+      .comment .username {
+        font-size: 20px;
+        font-weight: 700;
+        color: #143a63;
+      }
+
+      .comment .date {
+        font-size: 14px;
+        font-weight: 400;
+        color: #999;
+      }
+      .title{
+        color: rgb(17, 17, 17);
+       text-align: center;
+        font-size: 36px;
+        text-decoration: dashed;
+        letter-spacing: 0.1em;
+        
+        text-shadow: 2px 2px 4px rgba(98, 228, 245, 0.4);
+
+ 
+      }
+    </style>
+  </head>
+  <body><title>Sección de comentarios</title>
+    <div id="wrapper2">
+      <h1 class="title">Datos Epicollect</h1>
+
+      {% for comentario in comentarios %}
+        <div class="comment">
+          <p class="username">{{ comentario.username }}</p>
+          <p class="date">{{ comentario.date }}</p>
+          <p class="text">{{ comentario.comment }}</p>
+        </div>
+      {% endfor %}
+
+      <h3>Escribe tu comentario</h3>
+      <form method="POST" action="{{ url_for('comment') }}">
+        <textarea name="comment"></textarea>
+        <input type="submit" value="Enviar">
+      </form>
+    </div>
+  </body>
 </html>
+
 
 {% endblock %}

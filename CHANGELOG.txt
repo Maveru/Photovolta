@@ -1,0 +1,12 @@
+Versión 02/05/2023
+
+Cambios principales:
+
+-Se permite el envio de datos a la API mediante POST
+-2 tipos diferentes de POST
+
+Cambios secundarios:
+
+-Se renombra el codigo principal a "app"
+-Mejora visual
+-Se mejora el login obligando a poner una contraseña mas segura

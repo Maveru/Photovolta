@@ -2,53 +2,75 @@
 {% block title %}Login / Photovolta{% endblock %}
 {% block content %}
 <link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
-<html>
+<style>
+	
+	h2{
+		text-align: center;
+		
+	}
+	.error-message {
+			color: #d8000c; /* color rojo oscuro */
+			background-color: #ffd2d2; /* color de fondo rosa claro */
+			border: 1px solid #d8000c; /* borde rojo oscuro */
+			padding: 10px; /* espacio interior */
+			margin-bottom: 10px; /* margen inferior */
+			border-radius: 5px; /* bordes redondeados */
+			font-size: 16px; /* tamaño de fuente */
+			font-weight: bold; /* texto en negrita */
+			}
 
+	ayuda {
+		background-color: #fdfdfd00;
+		color: #636363;
+		border-radius: 0.25em;
+	}
+</style>
+
+<body class="is-preload">
+	<!-- Wrapper -->
+	  <div id="wrapper">
+		<!-- Main -->
+		  <div id="ayuda">
+			<!-- Introduction -->
+			  <section id="intro" class="main">
+				<h2>¡Gracias por volver a Photovolta!</h2>
+				<header class="major">
+				  
+				  
+				</header>
+				<div >
+				  <div class="content">
+					<body >
 	
-	<header id="header">
-			<h1>Inicio de sesion</h1>
-			<p>¡Gracias por volver a Photovolta!</p>
-			<style>
-				.error-message {
-					color: rgb(204, 5, 21);
-				}
-			</style>
-	</header>
-	<body >
-	
-		<!-- Wrapper -->	<!-- Content action="procesar_registro.php"--> 
-			
-		<form action="" method="post" > <!--action = atributo action se indica la URL a la que se enviarán los datos del formulario--> 
+						<!-- Wrapper -->	<!-- Content action="procesar_registro.php"--> 
+							
+						<form action="" method="post" > <!--action = atributo action se indica la URL a la que se enviarán los datos del formulario--> 
+								
+							<label for="username">Nombre de usuario:</label>
+							<input type="text" id="username" name="username" required><br>
+																
+							<label for="password">Contraseña:</label>
+							<input type="password" id="password" name="password" required><br>
+							{% if error_message %}
+							<div class="error-message">{{ error_message }}</div>
+							{% endif %}
+					
+							<input type="submit" id="send-signup" name="signup" value="Iniciar sesion" />
+							<p>¿No tienes cuenta aún? <a href="{{ url_for('signup') }}">Regístrate aquí</a></p>
+							
+						</form>
 				
-			<label for="username">Nombre de usuario:</label>
-			<input type="text" id="username" name="username" required><br>
-												
-			<label for="password">Contraseña:</label>
-			<input type="password" id="password" name="password" required><br>
-			{% if error_message %}
-            <div class="error-message">{{ error_message }}</div>
-        	{% endif %}
-	
-			<input type="submit" id="send-signup" name="signup" value="Iniciar sesion" />
-            <p>¿No tienes cuenta aún? <a href="{{ url_for('signup') }}">Regístrate aquí</a></p>
-			
-		</form>
-
-			<!-- Main -->
-			
-
-
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
-
-	</body>
-</html>
-
+					
+				
+					</body>
+					</table>
+				  </div>
+				</div>
+				
+			  
+			  </section>
+	  <!-- Main -->
+	  
+  </body>
 
 {% endblock %}

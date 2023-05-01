@@ -1,0 +1,67 @@
+{% extends "nav.html" %}
+{% block title %}Graficas / Photovolta{% endblock %}
+{% block content %}
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Análisis de datos</title>
+	<style>
+		#wrapper2 {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+			border-radius: 2%;
+			background-color: #fff;
+			
+		}
+		
+		.title {
+			color: rgb(17, 17, 17);
+			text-align: center;
+			font-size: 36px;
+			text-decoration: dashed;
+			letter-spacing: 0.1em;
+			text-shadow: 2px 2px 4px rgba(98, 228, 245, 0.4);
+		}
+		
+		h2 {
+			color: black;
+		}
+		.content{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		
+		}
+		figcaption {
+			text-align: center;
+			font-size: 1.2em;
+			color: #333;
+			margin-top: 0;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="wrapper2">
+		<h1 class="title">Análisis de datos</h1> 
+		<h2>A partir de los datos se extraen las siguientes gráficas:</h2> 
+		<div class="content">
+			<!-- Inserta la imagen de la gráfica -->
+			
+			<img src="static/graficas/irradiancia_hora.png" alt="Gráfica de irradiancia media horaria" width="600" height="400">
+			<figcaption>Irradiancia media horaria</figcaption>
+
+			
+			<!-- Inserta la imagen de la gráfica -->
+			<img src="static/graficas/irradiancia_mes.png" alt="Gráfica de irradiancia media mensual" width="600" height="400">
+			<figcaption>Irradiancia media mensual</figcaption>
+		</div>
+	</div>
+</body>
+</html>
+
+
+{% endblock %}
+

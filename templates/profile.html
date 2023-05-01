@@ -1,39 +1,147 @@
-
 {% extends "nav.html" %}
 {% block title %}Perfil / Photovolta{% endblock %}
+
 {% block content %}
-
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Perfil de Usuario</title>
+	<title>Mi perfil</title>
+	<style>
+		
+    form {
+        display: flex;
+        flex-direction: column;
+        max-width: 200px;
+        margin: 0 auto;
+        vertical-align: text-top;
+    }
+    
+    
+
+		.container {
+			max-width: 500px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #fff;
+			box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+			border-radius: 2%;
+      color:black
+		}
+
+		h2 {
+        margin-bottom: 0.5em;
+    }
+    p {
+        margin-bottom: 1em;
+    }
+		.profile-picture {
+			display: block;
+			margin: 0 auto 20px auto;
+			width: 150px;
+			height: 150px;
+			object-fit: cover;
+			object-position: center;
+			border-radius: 50%;
+			cursor: pointer;
+			transition: all 0.3s ease-in-out;
+      color:black
+		}
+
+		.profile-picture:hover {
+			transform: scale(1.1);
+		}
+
+		.info {
+			margin-bottom: 20px;
+      color:black
+		}
+
+		.info p {
+			margin-bottom: 10px;
+      color:black
+		}
+
+		.info strong {
+			font-weight: bold;
+      color:black
+		}
+
+		.logout-form {
+			display: flex;
+			justify-content: flex-end;
+			margin-bottom: 10px;
+      color:rgb(104, 188, 228)
+		}
+
+		.logout-form button {
+			background-color: #4bcfc9;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.3s ease-in-out;
+      color:black
+		}
+
+		.logout-form button:hover {
+			background-color: #27df92;
+		}
+
+		.delete-form {
+		
+      vertical-align: middle;
+		}
+    button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+		.delete-form button {
+			background-color: #f15549;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.3s ease-in-out;
+      color:black
+		}
+
+		.delete-form button:hover {
+			background-color: #9c2323;
+      color:black
+		}
+   h2{
+    text-align: center;
+    color: black;
+    font-weight: bold;
+   }
+	</style>
 </head>
-<head>
-    <script>
-      function confirmDelete() {
-         if (confirm("¿Estás seguro de que quieres eliminar tu cuenta? Se borrarán todos tus comentarios y perderás tus puntos")) {
-            document.querySelector("#delete-account-form").submit();
-        }
-     }
-    </script>
-  </head>
-  
 <body>
-    <h1>Perfil de Usuario</h1>
-    <p><strong>Nombre de usuario:</strong> {{ username }}</p>
-    <p><strong>Correo electrónico:</strong> {{ email }}</p>
-    <p><strong>Puntuación actual:</strong> {{ score }} puntos</p>
-
-    <form action="{{ url_for('logout') }}" method="post">
-        <button type="submit">Cerrar sesión</button>
-    </form>
-    <form id="delete-account-form" action="{{ url_for('deleteProfile') }}" method="post">
-        <button type="button" onclick="confirmDelete()">Eliminar cuenta</button>
-    </form>
-      
-
+	<div class="container">
+		<h2>Mi perfil</h2>
+		<img src="https://pbs.twimg.com/profile_images/1411797865798713348/eYMHwgSw_400x400.jpg" alt="Mi foto de perfil" class="profile-picture" onclick="alert('Haz clic para cambiar la foto de perfil')">
+		<div class="info">
+			<p><strong>Nombre de usuario:</strong> {{ username }}</p>
+			<p><strong>Correo electrónico:</strong> {{ email }}</p>
+			<p><strong>Puntuación actual:</strong> {{ score }} puntos</p>
+		</div>
+		<form class="logout-form" action="{{ url_for('logout') }}" method="post">
+			<button type="submit">Cerrar sesión</button>
+		</form>
+		<form class="delete-form" action="{{ url_for('deleteProfile') }}" method="post">
+			<button type="button" onclick="confirm('¿Estás seguro de que quieres eliminar tu cuenta? Se borrarán todos tus comentarios y perderás tus puntos')">Eliminar cuenta</button>
+		</form>
+	</div>
 </body>
 </html>
 
-{% endblock %}
+      {% endblock %}
+</html>
+
+
+

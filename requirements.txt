@@ -1,4 +1,5 @@
 flask_wtf
+flask
 email_validator
 flask_session
 flask_sqlalchemy
@@ -8,3 +9,6 @@ folium
 pyepicollect
 geopy
 opencv-python
+pandas
+matplotlib
+password_strength

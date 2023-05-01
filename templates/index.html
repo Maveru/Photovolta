@@ -4,8 +4,11 @@
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
+
+
 <link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
 <html>
+	
 	<head>
 		<title>Inicio / Photovolta</title>
 		<meta charset="utf-8" />
@@ -18,12 +21,15 @@
 		<!-- Wrapper -->
 			<div id="wrapper">
 
+
 				<!-- Header -->
 					<header id="header" class="alt">
 						<span class="logo"><img src="static/images/logoPhotovolta.png" alt="" /></span>
 									
 					</header>
-
+					{% extends "nav.html" %}
+					{% block title %}Leaderboard / Photovolta{% endblock %}
+					{% block content %}
 				<!-- Nav -->
 					<nav id="nav">
 						<ul>
@@ -41,6 +47,8 @@
 							<section id="intro" class="main">
 								<header class="major">
 									<h2>¿Que es Photovolta?</h2>
+									<!--<a href="https://five.epicollect.net/project/recoleccinn-datos-irradiancia">enlace 1</a>
+									<a href="https://five.epicollect.net/project/recoleccinn-datos-irradiancia/add-entry">enlace 2</a>-->
 								</header>
 								<div >
 									<div class="content">
@@ -113,7 +121,7 @@
 								</footer>
 								<footer class="major">
 									<ul class="actions special">
-										<li><a href="mapa" class="button">Mapa de entradas</a></li>
+										<li><a href="graficas" class="button">Representacion de datos</a></li>
 									</ul>
 									
 								</footer>
@@ -154,26 +162,7 @@
 					</div>
 
 				<!-- Footer -->
-				<footer id="footer">
-					
-					<section>
-						
-						<ul class="icons">
-							<li><a href="#" class="icon brands fa-twitter alt"><span class="label">Twitter</span></a></li>
-							
-							<li><a href="#" class="icon brands fa-instagram alt"><span class="label">Instagram</span></a></li>
-							<li><a href="https://github.com/Maveru/Photovolta" class="icon brands fa-github alt"><span class="label">GitHub</span></a></li>
-							
-						</ul>
-						<ul></ul>
-					</section>
-					<p class="footer-text">
-						&copy; Untitled. 
-						Design: <a href="https://html5up.net">HTML5 UP</a>.
-					</p>
-				
-				</footer>
-				
+			
 					
 
 			</div>
@@ -189,6 +178,8 @@
 
 	</body>
 </html>
+
+{% endblock %}
  <!----
 
 <footer id="footer">

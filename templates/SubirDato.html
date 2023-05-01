@@ -1,0 +1,106 @@
+{% extends "nav.html" %}
+{% block title %}Mapa / Photovolta{% endblock %}
+{% block content %}
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
+
+<html>
+<head>
+	<title>Seleccionar Ubicación</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js"></script>
+	<style>
+		#mapid {
+            height: 300px;
+            width: 300px;
+            border: 2px solid rgb(255, 255, 255);
+            border-radius: 5px;
+            margin:auto;
+		}
+        .input-container label,
+        .input-container input {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 10px;
+        }
+
+        .input-container label {
+        width: 40px;
+        }
+	</style>
+</head>
+<body>
+
+
+	<form action="/addData" method="POST">
+        <label for="username">Nombre de usuario:</label>
+        <input type="text" name="user">
+    
+ 
+        <div class="input-container">
+            <label for="fecha">Fecha:</label>
+            <input type="date" name="fecha">
+            <label for="hora">Hora:</label>
+            <input type="time" name="hora">
+          </div>
+        
+        
+		<label for="latitude">Latitud:</label>
+		<input type="text" id="latitude" name="latitude" readonly>
+		<br>
+		<label for="longitude">Longitud:</label>
+		<input type="text" id="longitude" name="longitude" readonly>
+        <button type="button" onclick="getLocation()">Obtener ubicación</button>
+	
+        <div id="mapid"></div>
+
+        <label for="fotografia">Fotografia:</label>
+        <input type="file" name="fotografia">
+        
+        <div> <input type="submit" value="Enviar"></div>
+		
+	</form>
+    
+	<script>
+		var mymap = L.map('mapid').setView([40.4168, -3.7038], 5);
+		
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			id: 'mapbox/streets-v11',
+			tileSize: 512,
+			zoomOffset: -1
+		}).addTo(mymap);
+
+		var marker = L.marker([40.4168, -3.7038], {draggable:true}).addTo(mymap);
+		
+		marker.on('dragend', function(event) {
+			var position = marker.getLatLng();
+			document.getElementById("latitude").value = position.lat;
+			document.getElementById("longitude").value = position.lng;
+		});
+	</script>
+
+<script>
+    function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      alert("Geolocalización no es soportado por su navegador.");
+    }
+    }
+    
+    function showPosition(position) {
+    document.getElementById("latitude").value = position.coords.latitude;
+    document.getElementById("longitude").value = position.coords.longitude;
+    }
+    </script>
+</body>
+</html>
+
+
+
+{% endblock %}
