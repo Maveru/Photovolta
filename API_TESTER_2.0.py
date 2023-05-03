@@ -22,7 +22,7 @@ width = 500
 height = 500
 
 
-if 0 == 0:
+if 0 == 1:
     for i in range(10):
 
 

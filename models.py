@@ -12,12 +12,14 @@ class User(db.Base):
     email = Column(String(80), nullable=False)
     password = Column(String(50), nullable=False)
     score = Column(Float, nullable=False)
+    profile_picture = Column(String(200), nullable=False)
 
-    def __init__(self, username, email,password):
+    def __init__(self, username, email,password,profile_picture):
         self.username = username
         self.email = email
         self.password = password
         self.score = 0
+        self.profile_picture=profile_picture
 
     def __repr__(self):
         return f"<User {self.id}>"

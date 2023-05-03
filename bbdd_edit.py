@@ -1,5 +1,5 @@
 import db
-from models import DatoEpicollect, DatoImagen,DatoValor
+from models import DatoEpicollect, DatoImagen,DatoValor,User
 
 
 #976
@@ -28,4 +28,6 @@ def LimpiarBase(Bbdd):
     print("Base de datos limpia")    
 
 
-LimpiarBase(DatoImagen)
+LimpiarBase(DatoEpicollect)
+
+

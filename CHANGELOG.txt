@@ -10,3 +10,10 @@ Cambios secundarios:
 -Se renombra el codigo principal a "app"
 -Mejora visual
 -Se mejora el login obligando a poner una contraseña mas segura
+
+
+03/05/2023
+
+-Se añade imagen de perfil
+-Mejora visual
+-Se permite subir datos desde la propia web

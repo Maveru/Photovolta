@@ -12,3 +12,4 @@ opencv-python
 pandas
 matplotlib
 password_strength
+mpld3

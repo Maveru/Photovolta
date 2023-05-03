@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,session
+from flask import Flask, render_template,request,redirect,url_for,session,flash,get_flashed_messages
 #import folium
 #import subprocess
 #import os
@@ -8,6 +8,8 @@ from datetime import datetime
 from GraphMaker import GraphMaker
 from MapMaker import MakeMap
 from password_strength import PasswordPolicy
+
+
 #from Epicollect_GetData import DatosTabla
 #from jinja2 import Environment
 
@@ -21,9 +23,10 @@ from models import Comment,User,DatoImagen,DatoValor,DatoEpicollect
 #flask --app .\mapflask.py run --host 0.0.0.0
 app = Flask(__name__)
 app.secret_key = "clave_secreta"
-UPLOAD_FOLDER = 'datosFoto'
+UPLOAD_FOLDER = 'static/datosFoto/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PFP_UPLOAD_FOLDER'] = 'static/userpfp/'
 Session(app)
 
 
@@ -74,6 +77,8 @@ def graficas():
 
 @app.route('/datos')
 def data():
+    
+    
     #Epicollect_GetData()
     #DatosTabla = db.session.query(DatoEpicollect).order_by(func.substr(DatoEpicollect.fecha, 6, 2) + '-' + func.substr(DatoEpicollect.fecha, 9, 2)).all()
     DatosTabla = db.session.query(DatoEpicollect).order_by(DatoEpicollect.analisis.desc()).all()
@@ -151,6 +156,7 @@ def signup():
         email = request.form['email'].lower()
         contraseña = request.form['password']
         error_message = None
+        pfp = "static/userpfp/user-default.png"
 
         all_users = db.session.query(User).all()
     
@@ -179,10 +185,10 @@ def signup():
         else:
             if contraseña == request.form['password_confirm']:
                 #users[username] = {'email': email, 'contraseña': contraseña}
-                usuario = User(username,email,contraseña)
+                usuario = User(username,email,contraseña,pfp)
                 db.session.add(usuario)
                 db.session.commit()
-                return redirect(url_for('login')) 
+                return render_template('signup.html', success_message='Registro exitoso') # Aquí se pasa el parámetro de éxito
             else:
                 error_message = '*Las contraseñas no coinciden'
                 return render_template('signup.html',error_message = error_message)
@@ -252,6 +258,8 @@ def deleteProfile():
     user = db.session.query(User).filter_by(username=username).first()
     print(f"Deleting user with username {user.username}")
     db.session.delete(user)
+    if user.profile_picture != "static/userpfp/user-default.png":
+        os.remove(user.profile_picture)
 
     comments = db.session.query(Comment).filter_by(username=username).all()
     for comment in comments:
@@ -270,48 +278,103 @@ def logout():
 
 @app.route('/test2')
 def tes2():
-   return render_template('subirDato.html')
+   if 'username' in session:
+        mensajes = get_flashed_messages(with_categories=True)
+        return render_template('subirDato.html',mensajes=mensajes)
+   else:
+        # Si el usuario no ha iniciado sesión, redirigir a la página de inicio de sesión
+        return redirect(url_for('login'))
 
 
-from flask import render_template, session, redirect, url_for
 
-@app.route('/profile')
+@app.route('/profile',methods=['GET','POST'])
 def perfil():
-    #Epicollect_GetData()
     if 'username' in session:
-        # Obtener los datos del usuario de la sesión
+
         username = session['username']
-       
+        
         user = db.session.query(User).filter_by(username=username).first()
         email = user.email
+        if request.method == 'POST':
+        # Manejar la carga de la imagen
+            file = request.files['profile_picture']
+            if file:
+                # Asegurarse de que el nombre de archivo sea seguro
+                filename = secure_filename(file.filename)
+                # Guardar la imagen en el directorio 'userpfp' en el directorio 'static'
+                file.save(os.path.join(app.config['PFP_UPLOAD_FOLDER'], filename))
+                if user.profile_picture != "static/userpfp/user-default.png":
+                    os.remove(user.profile_picture)
+
+                # Actualizar la foto de perfil del usuario en la base de datos
+                user.profile_picture = 'static/userpfp/' + filename
+                db.session.commit()
+                flash('La foto de perfil se ha actualizado correctamente.', 'success')
+                return redirect(url_for('perfil'))
+        # Obtener los datos del usuario de la sesión
+    
       
         datosPuntos = db.session.query(DatoEpicollect).filter_by(username=email).all()
         user.score = 0
         for punto in datosPuntos:
-            print(user.score)
-            print(punto.analisis)
+            #print(user.score)
+            #print(punto.analisis)
             user.score = user.score + punto.analisis   
        
         score = round(user.score,2)
         db.session.commit()   
         
         #date_registered = session['date_registered']
-
+        print(user.profile_picture)
         # Pasar los datos del usuario a la plantilla
-        return render_template('profile.html', username=username, email=email,score=score)
+        return render_template('profile.html', username=username, email=email,score=score,pfp=user.profile_picture)
     else:
         # Si el usuario no ha iniciado sesión, redirigir a la página de inicio de sesión
         return redirect(url_for('login'))
 
 
 
+@app.route('/uploadData', methods=['GET','POST']) #Para hacerlo desde la web
+def uploadData():
+    username = session['username']
+    user = db.session.query(User).filter_by(username=username).first()
+    
+    if request.method == 'POST':
+        email = user.email
+        
+        fecha = request.form['fecha']
+        hora = request.form['hora']
 
+        latitud = round(float(request.form['latitude'].replace(",",".")),6)
+        longitud = round(float(request.form['longitude'].replace(",",".")),6)
+
+        imagen = request.files['fotografia']
+
+        if not imagen.filename:
+            return "Error: no se ha enviado ningún archivo"
+        filename = secure_filename(imagen.filename)
+        extension = filename.rsplit('.', 1)[1].lower()
+        if extension not in {'jpg', 'jpeg', 'png'}:
+            return "Error: solo se permiten archivos de imagen (jpg, jpeg, png)"
+        
+       
+       
+       
+        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        print("El dato ha llegado bien el sensor que da imagen")
+        #Crea un diccionario para cada usuario
+        Dato = DatoEpicollect(username=email,fecha=fecha,hora=hora,latitud=latitud,longitud=longitud,analisis=0,url=os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        db.session.add(Dato)
+        db.session.commit()
+        flash('El dato ha sido insertado correctamente', 'success')
+        return redirect(url_for('tes2'))
+        
 
 
 from werkzeug.utils import secure_filename
 import os
 
-@app.route('/addData', methods=['POST'])
+@app.route('/addData', methods=['POST']) #Para sensores
 def addData():
 
     id_sensor = request.form['id_sensor']
