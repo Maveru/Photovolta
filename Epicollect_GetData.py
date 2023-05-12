@@ -4,7 +4,8 @@ import urllib.request
 import numpy as np
 import cv2
 import pprint
-from models import DatoEpicollect
+from models import DatoPersona
+
 import db
 import datetime
 #se puede borrar
@@ -71,7 +72,7 @@ def Epicollect_GetData():
   
     flag = 1
 
-    Database =  db.session.query(DatoEpicollect).all()
+    Database =  db.session.query(DatoPersona).all()
 
   
     print("holabucle")
@@ -82,7 +83,7 @@ def Epicollect_GetData():
             print("La bbdd ya esta actualizada")
             break
 
-        user = entry['user']
+        user = entry['user'].lower()
         latitud = entry['lugar']['latitude']
         longitud = entry['lugar']['longitude']
         fecha = entry['fecha']
@@ -92,11 +93,11 @@ def Epicollect_GetData():
         #Diccionario que guarda cada entrada de Epicollect
         #entrada = {"Usuario":user,"Latitud":latitud,"Longitud":longitud,"Fecha":fecha,"Hora":hora,"Analisis":analyze_image(url),"url":url} 
 
-       
-        Dato = DatoEpicollect(user,latitud,longitud,fecha.replace("/","-"),hora,analyze_image(url),url)
+        origen = "Epicollect5"
+        Dato = DatoPersona(origen,user,latitud,longitud,fecha.replace("/","-"),hora,analyze_image(url),url)
         
     
-        Database = db.session.query(DatoEpicollect).filter_by(url=url).first()
+        Database = db.session.query(DatoPersona).filter_by(url=url).first()
         
         if Database is None:
             db.session.add(Dato)
@@ -108,6 +109,6 @@ def Epicollect_GetData():
        
 
 
-Epicollect_GetData()
+#Epicollect_GetData()
 #mapear()
 

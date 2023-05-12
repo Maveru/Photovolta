@@ -13,3 +13,5 @@ pandas
 matplotlib
 password_strength
 mpld3
+flask-jwt-extended
+werkzeug.security

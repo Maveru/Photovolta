@@ -1,0 +1,98 @@
+
+{% extends "nav.html"%}
+{% block title %}Device / Photovolta{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<title>Ejemplo de Estilos CSS</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+
+  h1 {
+    color: #ee04bb;
+    
+
+  }
+
+  h2 {
+    color: #666;
+    font-size: 18px;
+  }
+  h3{
+    font-family: 'Franklin Gothic Medium';
+    color:purple
+  }
+
+  p {
+    color: #777;
+  }
+
+  li{
+    color: red;
+
+  }
+  ul {
+    list-style-type: square;
+    color: #555;
+  }
+
+  a {
+    color: #00a;
+    text-decoration: none;
+  }
+
+  form {
+    margin-top: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  input[type="text"],
+  input[type="email"] {
+    width: 200px;
+    padding: 5px;
+    border: 1px solid #ccc;
+  }
+
+  input[type="submit"] {
+    background-color: #00a;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+</style>
+
+<body>
+    <h1>Título Principal</h1>
+    
+    <h2>Encabezado parrafo</h2>
+    
+    <p>Yo soy un parrafo para explicar las etiquetas HTML.</p>
+    
+    <h3>Listas:</h3>
+    <ul>
+      <li>Elemento 1</li>
+      <li>Elemento 2</li>
+      <li>Elemento 3</li>
+    </ul>
+    
+    <h3>Enlaces:</h3>
+    <p>Visita mi <a href="https://www.ejemplo.com">sitio web</a> para obtener más información.</p>
+    
+    <h3>Formularios:</h3>
+    <form>
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" required><br>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required><br>
+      <input type="submit" value="Enviar">
+    </form>
+
+</body>
+{% endblock %}

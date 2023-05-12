@@ -21,9 +21,8 @@ from folium.plugins import HeatMap, MiniMap, MousePosition
 
 import base64
 
-from models import DatoEpicollect,DatoImagen,DatoValor
+from models import DatoPersona,DatoSensor,TipoMedidaEnum,SensorAUT
 import db
-import sys
 
 from PIL import Image
 def mapear(long,latt,mensaje,texto,imagen_path,capa):
@@ -55,50 +54,44 @@ def mapear(long,latt,mensaje,texto,imagen_path,capa):
 
 
 
-def analyze_image(url):
-        # Descarga la imagen desde la URL
-        with urllib.request.urlopen(url) as url_response:
+
+def analyze_image(image_path_or_url):
+    # Verifica si la entrada es una URL o una ruta local
+    if image_path_or_url.startswith('http'):
+        with urllib.request.urlopen(image_path_or_url) as url_response:
             s = url_response.read()
         arr = np.asarray(bytearray(s), dtype=np.uint8)
-        # Convierte la imagen en una matrix
         img = cv2.imdecode(arr, -1)
-        
-        # Convierte la imagen a escala de grises
+    else:
+        img = cv2.imread(image_path_or_url, cv2.IMREAD_UNCHANGED)
+    
+    # Continúa con el procesamiento de la imagen
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 100, 200)
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
+    if lines is not None:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
-        # Crea un detector de bordes Canny
-        edges = cv2.Canny(gray, 100, 200)
-        
-        # Aplica una transformación de Hough para detectar líneas
-        lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
-        
-        # Si se detectan líneas, es una imagen de suelo
-        if lines is not None:
-            # Calcula la puntuación en función de la uniformidad de la iluminación
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            blur = cv2.GaussianBlur(gray, (5, 5), 0)
-            laplacian = cv2.Laplacian(blur, cv2.CV_64F)
-            variance = np.var(laplacian)
-            score = max(0, min(10, (variance - 20) / 10 + 5))
-            return round(score, 2)
-        
-        # Si no se detectan líneas, no es una imagen de suelo
-        else:
-            return 0
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+        laplacian = cv2.Laplacian(blur, cv2.CV_64F)
+        variance = np.var(laplacian)
+        score = max(0, min(10, (variance - 20) / 10 + 5))
+        return round(score, 2)
+    else:
+        return 0
 
 
 
 
 def MakeMap():
-    
+    print(TipoMedidaEnum)
     print("Creando Mapa...")
 
     geolocator = Nominatim(user_agent="Photovolta")
     location = geolocator.geocode("Madrid, Spain")
     madrid_coords = [location.latitude, location.longitude]
     madrid_map = folium.Map(location=madrid_coords, zoom_start=6)
-    capa_marcadores = folium.FeatureGroup(name='Imagenes',show=False)
-    capa_Epicollect = folium.FeatureGroup(name='Epicollect - Imagenes',show=False)
+    capa_Imagenes_sensores = folium.FeatureGroup(name='Sensores - Imagenes',show=False)
+    capa_Epicollect = folium.FeatureGroup(name='Usuarios - Imagenes',show=False)
 
 
     # Crear una lista vacía para almacenar los datos de latitud y longitud
@@ -108,7 +101,7 @@ def MakeMap():
     
     # Iterar sobre las entradas de cada usuario y extraer los valores de latitud y longitud
     lista_lat_lon = []
-    for entrada in db.session.query(DatoEpicollect).all():
+    for entrada in db.session.query(DatoPersona).all():
 
         #para poder poner en timestamp 
         cadena_str = entrada.fecha + " " + entrada.hora
@@ -118,36 +111,64 @@ def MakeMap():
         #print(entrada.latitud)
         lista_lat_lon.append((entrada.latitud, entrada.longitud)) # Añadir los valores a la lista como una tupla
 
-
-
-    DatosValores = []
-    for entrada in db.session.query(DatoValor).all():
+    DatosSensores = []    
+    for entrada in db.session.query(DatoSensor).all():
         #mapear(entrada.latitud,entrada.longitud,entrada.analisis,entrada.hora,entrada.url,capa_marcadores)
-        DatosValores.append((entrada.latitud, entrada.longitud)) # Añadir los valores a la lista como una tupla
-
-    DatosImagen = []    
-    for entrada in db.session.query(DatoImagen).all():
-        #mapear(entrada.latitud,entrada.longitud,entrada.analisis,entrada.hora,entrada.url,capa_marcadores)
-        mapear(entrada.latitud, entrada.longitud,10,entrada.hora,entrada.imagen,capa_marcadores)
-        DatosImagen.append((entrada.latitud, entrada.longitud)) # Añadir los valores a la lista como una tupl
-
+        if entrada.tipo_medida == TipoMedidaEnum("fotografia"):
+            print("estas mapeando una imagen")
+            print(analyze_image(entrada.valor))
+            mapear(entrada.latitud, entrada.longitud,analyze_image(entrada.valor),entrada.timestamp,entrada.valor,capa_Imagenes_sensores)
+        DatosSensores.append((entrada.latitud, entrada.longitud)) # Añadir los valores a la lista como una tupl
+    #mapear(long,latt,mensaje,texto,imagen_path,capa):
 
     #input('Presione cualquier tecla para salir...')
 
 
-    Mapa_Epciollect = HeatMap(data=lista_lat_lon,name = 'Epicollect', radius=10)
+    Mapa_Epciollect = HeatMap(data=lista_lat_lon,name = 'Usuarios', radius=10)
     Mapa_Epciollect.add_to(madrid_map)
    # Mapa_CSV = HeatMap(data=lista_lat_lon,name = 'Sensores', radius=10)
    # Mapa_CSV.add_to(madrid_map)
-    MapaImagen = HeatMap(data=DatosImagen,name = 'Camaras', radius=10)
+    MapaImagen = HeatMap(data=DatosSensores,name = 'Sensores', radius=10)
     MapaImagen.add_to(madrid_map)
-    MapaValors = HeatMap(data=DatosValores,name = 'Sensores detectores', radius=10)
-    MapaValors.add_to(madrid_map)
-    capa_marcadores.add_to(madrid_map)
+    capa_Imagenes_sensores.add_to(madrid_map)
     capa_Epicollect.add_to(madrid_map)
     mouse_position = MousePosition()
     mouse_position.add_to(madrid_map)
     folium.LayerControl().add_to(madrid_map)
     MiniMap(position="bottomleft").add_to(madrid_map)
-    #madrid_map.save('templates/madrid_map.html')
     madrid_map.save('templates/madrid_map.html')
+    #madrid_map.save('madrid_map11.html')
+
+
+#MakeMap()
+
+
+def MakeUserMap(usuario):
+    print(TipoMedidaEnum)
+    print("Creando Mapa...")
+
+    geolocator = Nominatim(user_agent="Photovolta")
+    location = geolocator.geocode("Madrid, Spain")
+    madrid_coords = [location.latitude, location.longitude]
+    madrid_map = folium.Map(location=madrid_coords, zoom_start=6)
+    capa_Imagenes_sensores = folium.FeatureGroup(name='Sensores - Imagenes',show=False)
+
+   
+    DatosSensores = []    
+    for entrada in db.session.query(SensorAUT).filter_by(username_asociado=usuario).all():
+        for sensor in db.session.query(DatoSensor).filter_by(id_sensor=entrada.id_sensor).all():
+       
+            if sensor.tipo_medida == TipoMedidaEnum("fotografia"):
+           
+                print(analyze_image(sensor.valor))
+                mapear(sensor.latitud, sensor.longitud,analyze_image(sensor.valor),sensor.timestamp,sensor.valor,capa_Imagenes_sensores)
+            DatosSensores.append((sensor.latitud, sensor.longitud)) 
+  
+    MapaImagen = HeatMap(data=DatosSensores,name = 'Sensores', radius=10)
+    MapaImagen.add_to(madrid_map)
+    capa_Imagenes_sensores.add_to(madrid_map)
+    mouse_position = MousePosition()
+    mouse_position.add_to(madrid_map)
+    folium.LayerControl().add_to(madrid_map)
+    madrid_map.save('templates/usermap.html')
+

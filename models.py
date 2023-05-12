@@ -1,8 +1,11 @@
 import db
+import enum
 
-from sqlalchemy import Column, Integer, String, Float,ForeignKey
+from sqlalchemy import Column, Integer, String, Float,ForeignKey,Enum
 
 from datetime import datetime
+
+
 
 class User(db.Base):
     __tablename__ = 'users'
@@ -42,59 +45,43 @@ class Comment(db.Base):
     
 
 
-class DatoImagen(db.Base):
-    __tablename__ = 'DatoImagen'
+class TipoMedidaEnum(enum.Enum):
+    fotografia = "fotografia"
+    irradiancia = "irradiancia"
+    SVF = "SVF"
+
+class DatoSensor(db.Base):
+    __tablename__ = 'DatoSensor'
 
     id = Column(Integer, primary_key=True)
     id_sensor = Column(Integer, nullable=False)
-    fecha = Column(String(20), nullable=False)
-    hora= Column(String(20), nullable=False)
+    timestamp = Column(String(25), nullable=False)
     latitud = Column(Float, nullable=False)
     longitud = Column(Float, nullable=False)
-    imagen = Column(String(200), nullable=False)
-
-    def __init__(self, id_sensor, latitud,longitud,fecha,hora,imagen):
-        self.id_sensor = id_sensor
-        self.fecha = fecha
-        self.hora = hora
-        self.latitud = latitud
-        self.longitud = longitud
-        self.imagen = imagen
-
-    def __repr__(self):
-        return f"<DatoImagen {self.id}>"
-
-
-class DatoValor(db.Base):
-    __tablename__ = 'DatoValor'
- 
-    id = Column(Integer, primary_key=True)
-    id_sensor = Column(Integer, nullable=False)
-    fecha = Column(String(20), nullable=False)
-    hora = Column(String(20), nullable=False)
-    latitud = Column(Float, nullable=False)
-    longitud = Column(Float, nullable=False)
-    valor_medida = Column(Float, nullable=False)
-
-    def __init__(self, id_sensor, latitud,longitud,fecha,hora,valor_medida):
-        self.id_sensor = id_sensor
-        self.fecha = fecha
-        self.hora = hora
-        self.latitud = latitud
-        self.longitud = longitud
-        self.valor_medida = valor_medida
-
-    def __repr__(self):
-        return f"<DatoValor {self.id}>"
+    orientacion = Column(Integer,nullable=False)
+    tipo_medida = Column(Enum(TipoMedidaEnum),nullable=False)
+  
+    valor = Column(String(200), nullable=False)
     
 
 
+    def __init__(self, id_sensor,timestamp, latitud,longitud,orientacion,tipo_medida,valor):
+        self.id_sensor = id_sensor
+        self.timestamp = timestamp
+        self.latitud = latitud
+        self.longitud = longitud
+        self.orientacion = orientacion
+        self.tipo_medida = tipo_medida
+        self.valor = valor
 
+    def __repr__(self):
+        return f"<DatoSensor {self.id}>"
 
-class DatoEpicollect(db.Base):
-    __tablename__ = 'DatoEpicollect'
+class DatoPersona(db.Base):
+    __tablename__ = 'DatoPersona'
 
     id = Column(Integer, primary_key=True)
+    origen = Column(String(20),nullable=False)
     username = Column(String(80), nullable=False)
     fecha = Column(String(20), nullable=False)
     hora = Column(String(20), nullable=False)
@@ -103,7 +90,8 @@ class DatoEpicollect(db.Base):
     analisis = Column(Float, nullable=False)
     url = Column(String(200), nullable=False)
 
-    def __init__(self, username, latitud,longitud,fecha,hora,analisis,url):
+    def __init__(self, origen,username, latitud,longitud,fecha,hora,analisis,url):
+        self.origen = origen
         self.username = username
         self.fecha = fecha
         self.hora = hora
@@ -113,5 +101,22 @@ class DatoEpicollect(db.Base):
         self.url = url
 
     def __repr__(self):
-        return f"<Dato {self.id}>"
+        return f"<DatoPersona {self.id}>"
     
+
+
+class SensorAUT(db.Base):
+    __tablename__ = 'SensorAUT'
+
+    id = Column(Integer, primary_key=True)
+    id_sensor = Column(Integer, nullable=False)
+    username_asociado = Column(String(80), nullable=False)
+    token = Column(String(32), nullable=False)
+
+    def __init__(self, id_sensor, username_asociado,token):
+        self.id_sensor = id_sensor
+        self.username_asociado = username_asociado
+        self.token = token
+    
+    def __repr__(self):
+        return f"<Sensortoken {self.id}>"

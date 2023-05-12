@@ -1,0 +1,251 @@
+{% extends "nav.html" %}
+{% block title %}Perfil / Photovolta{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mi perfil</title>
+	<style>
+		
+    form {
+        display: flex;
+        flex-direction: column;
+        max-width: 200px;
+        margin: 0 auto;
+        vertical-align: text-top;
+    }
+    
+    
+
+		.container {
+			max-width: 500px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #fff;
+			box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+			border-radius: 2%;
+      color:black
+		}
+
+		h2 {
+        margin-bottom: 0.5em;
+    }
+    p {
+        margin-bottom: 1em;
+    }
+		.profile-picture {
+			display: block;
+			margin: 0 auto 20px auto;
+			width: 150px;
+			height: 150px;
+			object-fit: cover;
+			object-position: center;
+			border-radius: 50%;
+			cursor: pointer;
+			transition: all 0.3s ease-in-out;
+      color:black
+		}
+
+		.profile-picture:hover {
+			transform: scale(1.1);
+		}
+
+		.info {
+			margin-top: 10px;
+			margin-bottom: 20px;
+      color:black
+		}
+
+		.info p {
+			margin-bottom: 10px;
+      color:black
+		}
+
+		.info strong {
+			font-weight: bold;
+      color:black
+		}
+
+		.logout-form {
+			display: flex;
+			justify-content: flex-end;
+			margin-bottom: 10px;
+      color:rgb(104, 188, 228)
+		}
+
+		.logout-form button {
+			background-color: #4bcfc9;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.3s ease-in-out;
+      color:black
+		}
+
+		.logout-form button:hover {
+			background-color: #27df92;
+		}
+
+		.delete-form {
+		
+      vertical-align: middle;
+		}
+    button {
+				color: black;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		}
+		input[type="submit"] {
+    background-color: #4bcfc9;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  input[type="submit"]:hover {
+    background-color: #27df92;
+  }
+
+
+
+		.delete-form button {
+			background-color: #f15549;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.3s ease-in-out;
+      color:black
+		}
+
+		.delete-form button:hover {
+			background-color: #9c2323;
+      color:black
+		}
+   label,h2{
+	border: black;
+    text-align: center;
+    color: black;
+    font-weight: bold;
+   }
+   .form-small {
+	justify-content: flex-end;
+	border: none;
+	box-shadow: none;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	
+}
+
+.form-small label {
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-small input[type="file"] {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-small input[type="submit"] {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	font-size: 0.8rem;
+	background-color: #4bcfc9;
+	color: #fff;
+	border: none;
+	padding: 0.5rem 1rem;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.3s ease-in-out;
+}
+
+.form-small input[type="submit"]:hover {
+  background-color: #27df92;
+}
+ul.mensajes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mensajes li {
+  margin: 0;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+.mensajes .success {
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+}
+
+.mensajes .error {
+  background-color: #f44336;
+  color: white;
+}
+
+.mensajes .warning {
+  background-color: #ff9800;
+  color: white;
+}
+
+.mensajes .info {
+  background-color: #2196F3;
+  color: white;
+}
+	</style>
+</head>
+<body>
+	{% with mensajes = get_flashed_messages(with_categories=true) %}
+	{% if mensajes %}
+	  <ul class="mensajes">
+		{% for categoria, mensaje in mensajes %}
+		  <li class="{{ categoria }}">{{ mensaje }}</li>
+		{% endfor %}
+	  </ul>
+	{% endif %}
+  {% endwith %}
+	<div class="container">
+		<h2>Mi perfil</h2>
+		<img src="{{ pfp }}" alt="Mi foto de perfil" class="profile-picture">
+		<form action="{{ url_for('perfil') }}" method="post" enctype="multipart/form-data" class="form-small">
+			<label for="profile_picture">Seleccionar foto de perfil</label>
+			<input type="file" name="profile_picture" id="profile_picture">
+			<input type="submit" value="Guardar cambios">
+		  </form>
+
+		  
+		<div class="info">
+			<p><strong>Nombre de usuario:</strong> {{ username }}</p>
+			<p><strong>Correo electrónico:</strong> {{ email }}</p>
+			<p><strong>Puntuación actual:</strong> {{ score }} puntos</p>
+		</div>
+		<form class="logout-form" action="{{ url_for('logout') }}" method="post">
+			<button type="submit">Cerrar sesión</button>
+		</form>
+		<form class="delete-form" action="{{ url_for('deleteProfile') }}" method="post">
+			<button type="submit" onclick="confirm('¿Estás seguro de que quieres eliminar tu cuenta? Se borrarán todos tus comentarios y perderás tus puntos')">Eliminar cuenta</button>
+		</form>
+	</div>
+</body>
+</html>
+
+      {% endblock %}
+</html>
+
+
+

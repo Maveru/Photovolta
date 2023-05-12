@@ -1,0 +1,31 @@
+{% extends "nav.html" %}
+{% block title %}Mapa / Photovolta{% endblock %}
+{% block content %}
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
+<html>
+  
+
+  <header>
+    <h1>Nuestros datos</h1>
+    <p>¡Aqui puedes ver las entradas del resto de usuarios!</p>
+</header>
+<body >
+		
+
+
+			<!-- Main -->
+			<style>
+				h1,p{
+					text-align: center;
+				}
+			</style>
+        <iframe src="mapeado" width="75%" height="750"></iframe>
+		
+
+            
+	</body>
+</html>
+
+{% endblock %}
+
+

@@ -17,3 +17,14 @@ Cambios secundarios:
 -Se añade imagen de perfil
 -Mejora visual
 -Se permite subir datos desde la propia web
+
+06/05/2023
+
+-Modificacion BBDD
+-Zona Admin para borrar datos
+
+13/5/2023
+
+-Autenticacion sensores
+-Se puede acceder a los perfiles de
+otros usuarios desde LeaderBoards

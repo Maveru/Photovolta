@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<style>
+    ul.mensajes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mensajes li {
+  margin: 0;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+.mensajes .success {
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+}
+</style>
+<head>
+    <title>Panel de Administración</title>
+</head>
+<body>
+    <h1>Panel de Administración</h1>
+    <form action="/admin" method="POST">
+        
+      <label for="password">Contraseña de Administrador:</label>
+      <input type="password" name="password" id="password" required><br><br>
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+	{% if mensajes %}
+	  <ul class="mensajes">
+		{% for categoria, mensaje in mensajes %}
+		  <li class="{{ categoria }}">{{ mensaje }}</li>
+		{% endfor %}
+	  </ul>
+	{% endif %}
+    {% endwith %}
+    {% if session.authenticated %}
+    
+    
+    <button onclick="location.href='/admin/DatoSensor'">Base de datos de sensores</button>
+    <button onclick="location.href='/admin/DatoPersona'">Base de datos de personas</button>
+    <button onclick="location.href='/admin/comentarios'">Base de datos de comentarios</button>
+    <button onclick="location.href='/admin/users'">Base de datos de usuarios</button>
+    {% endif %}
+    <h1>  <a href="/">Salir</a> </h1>
+</body>
+</html>

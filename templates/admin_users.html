@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Panel de Administración</title>
+</head>
+<body>
+    <h1>Panel de Administración</h1>
+    <h2>Aqui puedes borrar datos de la bbdd</h2>
+    <form action="/admin/users" method="POST">
+        
+        <label for="atributo">Campo:</label>
+        <input type="text" name="atributo" id="atributo" required><br><br>
+        
+        <label for="valor">Valor:</label>
+        <input type="text" name="valor" id="valor" required><br><br>
+        
+        <input type="submit" value="Enviar">
+    </form>
+    <h1>  <a href="/admin">Salir</a> </h1>
+    {% if datos %}
+    <h2>Datos de la base de datos</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>username</th>
+                <th>email</th>
+             
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for dato in datos %}
+                <tr>
+                    <td>{{ dato.username }}</td>
+                    <td>{{ dato.email }}</td>
+
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No hay datos en la base de datos.</p>
+{% endif %}
+</body>
+</html>

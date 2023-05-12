@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from models import DatoEpicollect,DatoValor
+from models import DatoPersona,DatoSensor
 import db
 import matplotlib.dates as mdates
 import datetime
@@ -13,10 +13,17 @@ def GraphMaker():
     hora = []
     fecha = []
     irradiancia = []
-    for entrada in db.session.query(DatoValor).all():
-        hora.append((entrada.hora)) 
-        fecha.append((entrada.fecha))
-        irradiancia.append((entrada.valor_medida)) 
+
+    for entrada in db.session.query(DatoSensor).filter_by(tipo_medida = "irradiancia"):
+        timestamp = entrada.timestamp
+        dt = datetime.datetime.fromisoformat(timestamp)
+
+        fecha_dato = dt.strftime('%Y-%m-%d')
+        hora_dato = dt.strftime('%H:%M:%S')
+
+        fecha.append(fecha_dato)
+        hora.append(hora_dato) 
+        irradiancia.append((float(entrada.valor))) 
 
     df = pd.DataFrame({
         'hora': hora,
