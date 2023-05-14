@@ -150,7 +150,7 @@ def MakeUserMap(usuario):
     geolocator = Nominatim(user_agent="Photovolta")
     location = geolocator.geocode("Madrid, Spain")
     madrid_coords = [location.latitude, location.longitude]
-    madrid_map = folium.Map(location=madrid_coords, zoom_start=6)
+    madrid_map = folium.Map(location=madrid_coords, zoom_start=5)
     capa_Imagenes_sensores = folium.FeatureGroup(name='Sensores - Imagenes',show=False)
 
    
@@ -160,7 +160,7 @@ def MakeUserMap(usuario):
        
             if sensor.tipo_medida == TipoMedidaEnum("fotografia"):
            
-                print(analyze_image(sensor.valor))
+                #print(analyze_image(sensor.valor))
                 mapear(sensor.latitud, sensor.longitud,analyze_image(sensor.valor),sensor.timestamp,sensor.valor,capa_Imagenes_sensores)
             DatosSensores.append((sensor.latitud, sensor.longitud)) 
   

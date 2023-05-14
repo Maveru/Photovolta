@@ -14,19 +14,18 @@ from flask_jwt_extended import JWTManager
 from PIL import Image
 from flask_jwt_extended import create_access_token
 
-#from Epicollect_GetData import DatosTabla
-#from jinja2 import Environment
-
-#from Epicollect_GetData import Epicollect_GetData,MakeMap
+from werkzeug.utils import secure_filename
+import os
+from sqlalchemy.orm.exc import NoResultFound
 
 import db
 import os
 from models import Comment,User,DatoSensor,DatoPersona,SensorAUT
 from bbdd_edit import EliminarDato
-#from sqlalchemy import func
 
+from flask import send_file
+import json
 
-#flask --app .\mapflask.py run --host 0.0.0.0
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = '685b9e7b32a529df7051e23c4c490808f783e4abbc7ea933cdb502385d694ecf'  # Clave secreta para firmar los tokens JWT -- secrets.token_hex(32)
 jwt = JWTManager(app)
@@ -51,21 +50,13 @@ def registrar_sensor(id_sensor):
 @app.route('/')
 def index():
     session.pop('authenticated', None)
-    Nusuarios = db.session.query(User).count()#No se si pasar los registrados en la pagina o los que han mandado datos a Epicollect
-   
+    Nusuarios = db.session.query(User).count() #No se si pasar los registrados en la pagina o los que han mandado datos a Epicollect
     Ndatos = db.session.query(DatoPersona).count()
-
-    users = db.session.query(User).all()
     score_total = 0
-    
     datosPuntos = db.session.query(DatoPersona.analisis).all()
-    
+
     for punto in datosPuntos:
             score_total += punto[0]
-            print(score_total)
-
-    
-
 
     return render_template('index.html',Nusuarios=Nusuarios,Ndatos=Ndatos,score_total=round(score_total,2))
 
@@ -93,8 +84,6 @@ def graficas():
 
 @app.route('/datos')
 def data():
-    
-    
     Epicollect_GetData()
     #DatosTabla = db.session.query(DatoPersona).order_by(func.substr(DatoPersona.fecha, 6, 2) + '-' + func.substr(DatoPersona.fecha, 9, 2)).all()
     DatosTabla = db.session.query(DatoPersona).order_by(DatoPersona.analisis.desc()).all()
@@ -103,8 +92,7 @@ def data():
 
 @app.route('/leaderboard')
 def leaderboard():
-    #Epicollect_GetData()
-       
+    #Epicollect_GetData() 
     users = db.session.query(User).all()
     
     for user in users:
@@ -141,8 +129,6 @@ def admin():
     return render_template('admin.html')
 
 
-from flask import send_file
-import json,io
 
 @app.route('/admin/registrar_sensor',methods=['GET', 'POST'])
 def admin_register():
@@ -261,10 +247,29 @@ def adminHuman():
         return render_template('admin_humano.html',datos=datos)
     else: 
         return redirect(url_for('admin'))
+    
+
+
+@app.route('/admin/sensoresAUT',methods=['GET', 'POST'])
+def adminSensorsAUT():
+    if 'authenticated' in session:
+        datos = db.session.query(SensorAUT).all()
+        if request.method == 'POST':
+        
+            atributo = request.form['atributo'].strip() 
+            valor = request.form['valor'].strip() 
+            EliminarDato(SensorAUT, atributo, valor)
+            flash('Dato eliminado correctamente.', 'success')
+            session.pop('authenticated', None)
+            return redirect(url_for('admin'))
+        return render_template('admin_sensoresAUT.html',datos=datos)
+    else: 
+        return redirect(url_for('admin'))
+
+
+
 
 users= {}
-
-comments = []
 
 
 @app.route('/feedback', methods=['GET', 'POST'])
@@ -281,9 +286,9 @@ def comment():
             if comment and not comment.isspace(): # Verifica si el comentario no está vacío y no consiste solo en espacios en blanco
                 now = datetime.now()
                 dt_string = now.strftime("%d/%m/%Y %H:%M") # Formatea la fecha y hora actual
-                comments.append({'username': session['username'], 'comment': comment, 'date': dt_string})
-                hola = Comment(session['username'], comment, dt_string)
-                db.session.add(hola)
+               
+                comentario = Comment(session['username'], comment, dt_string)
+                db.session.add(comentario)
                 
                 db.session.commit()
             return redirect(url_for('comment'))
@@ -303,7 +308,7 @@ def signup():
         email = request.form['email'].lower()
         contraseña = request.form['password']
         error_message = None
-        pfp = "static/userpfp/user-default.png"
+        pfp = "userpfp/user-default.png"
 
         all_users = db.session.query(User).all()
     
@@ -313,11 +318,9 @@ def signup():
             if u.username == username:
                 error_message = '*Nombre de usuario no disponible'
                 return render_template('signup.html',error_message = error_message)
-                break
             if u.email == email:
                 error_message = '*Email no disponible'
                 return render_template('signup.html',error_message = error_message)
-                break
 
         password_policy = PasswordPolicy.from_names(
             length=5,  # Mínimo de 8 caracteres
@@ -336,9 +339,6 @@ def signup():
                 usuario = User(username,email,pass_encrypt,pfp)
                 db.session.add(usuario)
                 db.session.commit()
-                print(contraseña )
-                print("<<--- Separador --->>")
-                print(pass_encrypt)
                 return render_template('signup.html', success_message='Registro exitoso') # Aquí se pasa el parámetro de éxito
             else:
                 error_message = '*Las contraseñas no coinciden'
@@ -348,48 +348,35 @@ def signup():
         return render_template('signup.html')
 
 
-# Definimos una ruta para la página de inicio de sesión
+# Inicio de sesión
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     
     if 'username' in session:
-        # Obtener los datos del usuario de la sesión
-
-        #date_registered = session['date_registered']
-
-         # Pasar los datos del usuario a la plantilla , date_registered=date_registered
         return redirect('profile')
+    
     if request.method == 'POST':
         username = request.form['username'].lower()
         password = request.form['password']
 
-        # Buscar todos los usuarios en la base de datos
         all_users = db.session.query(User).all()
     
         # Buscar el usuario con el nombre de usuario introducido
         user = None
         for u in all_users:
             if u.username == username:
-                print(password)
-                print("<<--- Separador --->>")
-                print(u.password)
+                
                 if (check_password_hash(u.password, password)) == True:
                     user = u
                 else:
                     return render_template('login.html', error_message='Contraseña incorrecta')
                 break
-    
-       # print('username:', user.username)
-        #print('email:', user.email)
-       # print('pass:', user.password)
-        
+
 
         if user is None:
             return render_template('login.html', error_message='Usuario no registrado')
         
         session['username'] = username
-        print(session['username'])
-
 
         return redirect(url_for('perfil'))
     else:
@@ -422,8 +409,8 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/test2')
-def tes2():
+@app.route('/uploaddata')
+def uploaddata():
    if 'username' in session:
         mensajes = get_flashed_messages(with_categories=True)
         return render_template('subirDato.html',mensajes=mensajes)
@@ -448,11 +435,12 @@ def perfil():
                 filename = secure_filename(file.filename)
                 # Guardar la imagen en el directorio 'userpfp' en el directorio 'static'
                 file.save(os.path.join(app.config['PFP_UPLOAD_FOLDER'], filename))
-                if user.profile_picture != "static/userpfp/user-default.png":
-                    os.remove(user.profile_picture)
+                if user.profile_picture != "userpfp/user-default.png":
+                    ruta_archivo = "static/" + user.profile_picture
+                    os.remove(ruta_archivo)
 
                 # Actualizar la foto de perfil del usuario en la base de datos
-                user.profile_picture = 'static/userpfp/' + filename
+                user.profile_picture = 'userpfp/' + filename
                 db.session.commit()
                 flash('La foto de perfil se ha actualizado correctamente.', 'success')
                 return redirect(url_for('perfil'))
@@ -483,30 +471,30 @@ def obtener_perfil(username):
 
 @app.route('/<username>/mapa')
 def UserMaper(username):
-
-
     perfil = obtener_perfil(username)
-    sensores = db.session.query(SensorAUT).filter_by(username_asociado=username).all()
     MakeUserMap(perfil.username)
 
     return render_template('usermap.html')
 
 
-@app.route('/<username>',methods=['GET'])
+@app.route('/profile/<username>',methods=['GET'])
 def usuario(username):
-   
     perfil = obtener_perfil(username)
     sensores = db.session.query(SensorAUT).filter_by(username_asociado=username).all()
-   
+    if session['username'] == perfil.username:
+        return redirect(url_for('perfil'))
+    
     return render_template('usuario.html', username=perfil.username,pfp=perfil.profile_picture,sensores=sensores)
 
-@app.route('/device',methods=['GET','POST'])
-def device():
-    if 'username' in session:
+@app.route('/device/<username>',methods=['GET','POST'])
+def device(username):
+    if session['username'] == obtener_perfil(username).username:
         username = session['username']
         user = db.session.query(User).filter_by(username=username).first()
         sensores = db.session.query(SensorAUT).filter_by(username_asociado=username).all()
         return render_template('device.html',username=username,pfp=user.profile_picture,sensores=sensores)
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route('/device/register',methods=['GET','POST'])
@@ -524,7 +512,7 @@ def deviceregister():
                 return "Error: Sensor ya registrado"
             username_asociado = session['username']
             token=registrar_sensor(sensor_id)
-            print(token)
+            #print(token)
             token_encriptado = generate_password_hash(token)
             sensor_aut = SensorAUT(id_sensor=sensor_id,username_asociado=username_asociado,token=token_encriptado)
             db.session.add(sensor_aut)
@@ -573,7 +561,7 @@ def uploadData():
         
        
         url=os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        print(url)
+        #print(url)
         if extension == 'jfif': # Descartado 
             print("es un jfif")
             with Image.open(url) as img:
@@ -582,13 +570,13 @@ def uploadData():
                 filename = new_filename
                 img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                print(url)
+               
         else:
             imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        print(url)
+      
         puntuacion = analyze_image(url)
-        print(puntuacion)
+        
         print("El dato del usuario ha llegado correctamente")
         #Crea un diccionario para cada usuario
         origen = "Web"
@@ -597,23 +585,21 @@ def uploadData():
         db.session.add(Dato)
         db.session.commit()
         flash('El dato ha sido insertado correctamente', 'success')
-        return redirect(url_for('tes2'))
+        return redirect(url_for('uploaddata'))
         
 
 
-from werkzeug.utils import secure_filename
-import os
-from sqlalchemy.orm.exc import NoResultFound
+
 
 #flask run --host=0.0.0.0
 
-
+from flask import make_response
 @app.route('/addData', methods=['POST']) #Para sensores
 def addData():
 
     id_sensor = request.form['id_sensor']
 
-    token = request.form['token']
+    token = request.headers.get('token')
     
     try:
         sensor = db.session.query(SensorAUT).filter_by(id_sensor=id_sensor).one()
@@ -630,7 +616,6 @@ def addData():
     #fecha_hora_formateada = datetime.fromisoformat(timestamp_iso).strftime("%Y-%m-%dT%H:%M:%S")
     fecha_objeto = datetime.fromisoformat(timestamp)
     timestamp = fecha_objeto.strftime("%Y-%m-%dT%H:%M:%S")
-
 
     #Cambio las , a . para evitar posibles problemas
     latitud = request.form['latitud'].replace(",",".")
@@ -651,7 +636,13 @@ def addData():
     
 
     tipo_medida = request.form['tipo_medida'] 
-    
+
+
+
+    mensaje = f"Dato insertado correctamente tipo  -  {tipo_medida}"
+    response = make_response(mensaje)
+    response.status_code = 200
+
     #Depeniendo de lo que se envie, es un  tipo u otro (visto en Postman)
     if request.content_type.startswith('multipart/form-data'):
 
@@ -663,42 +654,36 @@ def addData():
         extension = filename.rsplit('.', 1)[1].lower()
         if extension not in {'jpg', 'jpeg', 'png'}:
             return "Error: solo se permiten archivos de imagen (jpg, jpeg, png)"
-        
-       
-       
        
         valor.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        print("El dato ha llegado bien el sensor que da imagen")
-        #Crea un diccionario para cada usuario
+       
         Dato = DatoSensor(id_sensor=id_sensor,timestamp=timestamp,latitud=latitud,longitud=longitud,orientacion=orientacion,tipo_medida=tipo_medida,valor=os.path.join(app.config['UPLOAD_FOLDER'], filename))
         db.session.add(Dato)
         db.session.commit()
         
-   
-     #Depeniendo de lo que se envie, es un  tipo u otro (visto en Postman)
+        
+    #Dependiendo de lo que se envie, es un  tipo u otro (visto en Postman)
     if request.content_type == 'application/x-www-form-urlencoded':  
         valor = float(request.form['valor_medida'].replace(",","."))
         if tipo_medida == "SVF":
+            tipo_medida = tipo_medida.upper()
             if (valor) < 0 or (valor) > 1:
                 return "Error: SVF debe estar entre 0 y 1"
-        else:
+        elif tipo_medida == "irradiancia":
             valor = float(request.form['valor_medida'].replace(",","."))
             cifras_significativas = 4
             #por ser float pone automaticamente el .0
             if len(str(valor).split('.', 1)[0])+len(str(valor).split('.', 1)[1]) < cifras_significativas: 
-                raise ValueError("valor_medida debe tener  4 cifras significativas") 
+                return "valor_medida debe tener  4 cifras significativas"
 
 
-        print("El dato ha llegado bien desde el sensor que da valor, tipo - ",tipo_medida)
+      
         Dato = DatoSensor(id_sensor=id_sensor,timestamp=timestamp,latitud=latitud,longitud=longitud,orientacion=orientacion,tipo_medida=tipo_medida,valor=valor)
         db.session.add(Dato)
         db.session.commit() 
-        
-    return "Dato insertado correctamente"
 
-
-
-import json 
+    return response    
+    
 
 def serialize_enum(obj): #Para poder poner en Json la enumeracion
     return obj.value

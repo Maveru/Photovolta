@@ -224,8 +224,8 @@ ul.mensajes {
   {% endwith %}
 	<div class="container">
 		<h2>{{ username }}</h2>
-		<img src="{{ pfp }}" alt="Mi foto de perfil" class="profile-picture">
-	
+		<img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
+		
 		<div class="info">
             {% for sensor in sensores %}
             <p><strong>ID del sensor:</strong> {{ sensor.id_sensor }}</p>

@@ -19,7 +19,7 @@
     
 
 		.container {
-			max-width: 500px;
+			max-width: 1000px;
 			margin: 0 auto;
 			padding: 20px;
 			background-color: #fff;
@@ -98,7 +98,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		background-color: #9f4bcf;
 		}
+	button:hover{
+		background-color: #7304b3;
+	}
 		input[type="submit"] {
     background-color: #4bcfc9;
     color: #67468d;
@@ -207,6 +211,49 @@ ul.mensajes {
   background-color: #2196F3;
   color: white;
 }
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Ajustar el espacio entre los botones */
+}
+
+
+
+.vertical-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.vertical-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.info {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.horizontal-container {
+    display: flex;
+    justify-content: center;
+}
+
+
 	</style>
 </head>
 <body>
@@ -219,23 +266,33 @@ ul.mensajes {
 	  </ul>
 	{% endif %}
   {% endwith %}
-	<div class="container">
-		<h2>Mi perfil</h2>
-		<img src="{{ pfp }}" alt="Mi foto de perfil" class="profile-picture">
-		<form action="{{ url_for('perfil') }}" method="post" enctype="multipart/form-data" class="form-small">
-			<label for="profile_picture">Seleccionar foto de perfil</label>
-			<input type="file" name="profile_picture" id="profile_picture">
-			<input type="submit" value="Guardar cambios">
-		  </form>
-
-		  
+  <div class="container">
+    <div class="vertical-container">
+        <div class="vertical-item">
+			<div class="info">
+				<h2><strong>{{ username }}</strong> </h2>
+				
+			</div>
+            <img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
+            <form action="{{ url_for('perfil') }}" method="post" enctype="multipart/form-data" class="form-small">
+                <label for="profile_picture">Seleccionar foto de perfil</label>
+                <input type="file" name="profile_picture" id="profile_picture">
+                <input type="submit" value="Guardar cambios">
+            </form>
+        </div>
+        <div class="vertical-item">
+			<iframe src="{{ url_for('UserMaper', username=username) }}" width="400px" height="400"></iframe>
+        </div>
+    </div>
+    <div class="horizontal-container">
 		<div class="info">
-			<p><strong>Nombre de usuario:</strong> {{ username }}</p>
 			<p><strong>Correo electrónico:</strong> {{ email }}</p>
 			<p><strong>Puntuación actual:</strong> {{ score }} puntos</p>
 		</div>
-		
-		<form action="{{ url_for('device') }}" method="post">
+        
+    </div>
+	<div class="button-container">
+		<form action="{{ url_for('device', username=username) }}" method="post">
 			<button type="submit">Mis dispositivos</button>
 		</form>
 		<form class="logout-form" action="{{ url_for('logout') }}" method="post">
@@ -245,6 +302,8 @@ ul.mensajes {
 			<button type="submit" onclick="confirm('¿Estás seguro de que quieres eliminar tu cuenta? Se borrarán todos tus comentarios y perderás tus puntos')">Eliminar cuenta</button>
 		</form>
 	</div>
+</div>
+
 </body>
 </html>
 

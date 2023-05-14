@@ -15,8 +15,8 @@ url = 'http://localhost:5000/addData'
 
 
 
-id_sensor = 6699
-token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4MzkzMTU1MSwianRpIjoiMWU0ZjE5MjUtMmI2Mi00ODI0LTllZGQtNThlMzFiZmJmNjNkIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjY2OTkiLCJuYmYiOjE2ODM5MzE1NTEsImV4cCI6MTY4MzkzMjQ1MX0.PTxTL1jYPrHYYL5B4IHBykH4Ffy2CmzMbGc0DusoUuw"
+id_sensor = 3455
+token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NDAwMzQ4MiwianRpIjoiMTZmYzZjYTUtMjExZS00NWFhLWJjYjgtYTIwMzIxYWVjODM2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjM0NTUiLCJuYmYiOjE2ODQwMDM0ODIsImV4cCI6MTY4NDAwNDM4Mn0.sFPBEEdqn3Sr_TfjxqyYjM7QNIrr-NfjSzX8XGvkFNE"
 
 lat = 40.58221
 lon = -4.7709
@@ -79,11 +79,11 @@ for i in range (500):
             # Realizar la solicitud POST
             r = requests.post(url, data=entrada, files=files)
 
-            print(nombre)
+            #print(nombre)
             os.remove(nombre)
 
         
-            #print(r.text)
+            print(r.text)
             
 
     if select == 1:
@@ -106,7 +106,7 @@ for i in range (500):
 
             timestamp = datetime(anio_aleatorio,mes_aleatorio,dia_aleatorio,hour,minute,second).isoformat()
             
-            print(timestamp)
+            #print(timestamp)
 
             if mes_aleatorio in [3, 4, 5, 9, 10]: # Primavera y Otoño
                 if 10 <= hour <= 17:
@@ -173,7 +173,7 @@ for i in range (500):
             
             valor_medida = float(round(random.randint(0,10)*0.1,2))
             # Construir la entrada de datos
-            print(valor_medida)
+            #print(valor_medida)
 
             entrada = {
                 'id_sensor': id_sensor,
@@ -190,5 +190,4 @@ for i in range (500):
             r = requests.post(url, data=entrada)
             print(r.text)
             
-            print(timestamp)
 
