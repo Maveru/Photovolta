@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'Photovolta'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F0617CDDF52F4CEE90F02E0F882615A2 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A159B8AE29344E84B885FD2B2AA57830 }}
