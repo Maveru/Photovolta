@@ -623,7 +623,9 @@ def addData():
     orientacion = int(request.form['orientacion'])
     if orientacion >= 360: # 90 - Este, 180 - Sur, 270 - Oeste, 0 - Norte
         orientacion = orientacion-360
-    
+    inclinacion = int(request.form['inclinacion'])
+    if inclinacion > 180: #Por ejemplo
+        inclinacion = inclinacion-180
     try:
         latitud = float(latitud)
         longitud = float(longitud)#Valores maximos de latitud y long en la tierra
@@ -657,7 +659,7 @@ def addData():
        
         valor.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
        
-        Dato = DatoSensor(id_sensor=id_sensor,timestamp=timestamp,latitud=latitud,longitud=longitud,orientacion=orientacion,tipo_medida=tipo_medida,valor=os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        Dato = DatoSensor(id_sensor=id_sensor,timestamp=timestamp,latitud=latitud,longitud=longitud,orientacion=orientacion,inclinacion=inclinacion,tipo_medida=tipo_medida,valor=os.path.join(app.config['UPLOAD_FOLDER'], filename))
         db.session.add(Dato)
         db.session.commit()
         
@@ -678,7 +680,7 @@ def addData():
 
 
       
-        Dato = DatoSensor(id_sensor=id_sensor,timestamp=timestamp,latitud=latitud,longitud=longitud,orientacion=orientacion,tipo_medida=tipo_medida,valor=valor)
+        Dato = DatoSensor(id_sensor=id_sensor,timestamp=timestamp,latitud=latitud,longitud=longitud,orientacion=orientacion,inclinacion=inclinacion,tipo_medida=tipo_medida,valor=valor)
         db.session.add(Dato)
         db.session.commit() 
 

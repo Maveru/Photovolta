@@ -59,18 +59,20 @@ class DatoSensor(db.Base):
     latitud = Column(Float, nullable=False)
     longitud = Column(Float, nullable=False)
     orientacion = Column(Integer,nullable=False)
+    inclinacion = Column(Integer,nullable=False)
     tipo_medida = Column(Enum(TipoMedidaEnum),nullable=False)
   
     valor = Column(String(200), nullable=False)
     
 
 
-    def __init__(self, id_sensor,timestamp, latitud,longitud,orientacion,tipo_medida,valor):
+    def __init__(self, id_sensor,timestamp, latitud,longitud,orientacion,inclinacion,tipo_medida,valor):
         self.id_sensor = id_sensor
         self.timestamp = timestamp
         self.latitud = latitud
         self.longitud = longitud
         self.orientacion = orientacion
+        self.inclinacion = inclinacion
         self.tipo_medida = tipo_medida
         self.valor = valor
 

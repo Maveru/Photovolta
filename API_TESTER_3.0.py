@@ -9,14 +9,14 @@ import cv2
 
 from datetime import datetime
 
-url = 'http://localhost:5000/addData'
+url = 'http://127.0.0.1:5000/addData'
 
 #Envio de forma manual
 
 
 
-id_sensor = 3455
-token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NDAwMzQ4MiwianRpIjoiMTZmYzZjYTUtMjExZS00NWFhLWJjYjgtYTIwMzIxYWVjODM2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjM0NTUiLCJuYmYiOjE2ODQwMDM0ODIsImV4cCI6MTY4NDAwNDM4Mn0.sFPBEEdqn3Sr_TfjxqyYjM7QNIrr-NfjSzX8XGvkFNE"
+id_sensor = 1234
+token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NDMyMTIwNywianRpIjoiZjFiOGFlM2QtZDI5ZS00NjQ5LTk1MDEtMWM2NzI4YTk1M2I3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEyMzQiLCJuYmYiOjE2ODQzMjEyMDcsImV4cCI6MTY4NDMyMjEwN30.hFV7WijlWXsfAYMaJ0W9xNsdeZxcfTVmjnu8eTTuw4o"
 
 lat = 40.58221
 lon = -4.7709
@@ -54,6 +54,7 @@ for i in range (500):
             latitude = str(lat + lat_offset)
             longitude = str(lon + lon_offset)
             orientacion = random.randint(0, 360)
+            inclinacion = random.randint(0, 90)
         
             hour = random.randint(0, 23)
             minute=random.randint(0, 59)
@@ -68,16 +69,20 @@ for i in range (500):
             # Construir la entrada de datos
             entrada = {
             'id_sensor': id_sensor,
-            'token' : token,
+            #'token' : token,
             'timestamp': timestamp,
             'latitud': latitude,
             'longitud': longitude,
             'orientacion': orientacion,
+            'inclinacion': inclinacion,
             'tipo_medida' : "fotografia",
         }
+            header = {
+                 'token':token
 
+            }
             # Realizar la solicitud POST
-            r = requests.post(url, data=entrada, files=files)
+            r = requests.post(url, data=entrada, files=files,headers=header)
 
             #print(nombre)
             os.remove(nombre)
@@ -95,6 +100,7 @@ for i in range (500):
             latitude = str(lat + lat_offset)
             longitude = str(lon + lon_offset)
             orientacion = random.randint(0, 360)
+            inclinacion = random.randint(0, 90)
         
             hour = random.randint(0, 23)
             minute=random.randint(0, 59)
@@ -141,12 +147,17 @@ for i in range (500):
                 'latitud': latitude,
                 'longitud': longitude,
                 'orientacion': orientacion,
+                'inclinacion': inclinacion,
                 'tipo_medida' : "irradiancia",
                 'valor_medida':valor_medida,
             }
+            header = {
+                 'token':token
+
+            }
 
             # Realizar la solicitud POST
-            r = requests.post(url, data=entrada)
+            r = requests.post(url, data=entrada,headers=header)
             print(r.text)
 
 
@@ -159,6 +170,7 @@ for i in range (500):
             latitude = str(lat + lat_offset)
             longitude = str(lon + lon_offset)
             orientacion = random.randint(0, 360)
+            inclinacion = random.randint(0, 90)
         
             hour = random.randint(0, 23)
             minute=random.randint(0, 59)
@@ -182,12 +194,17 @@ for i in range (500):
                 'latitud': latitude,
                 'longitud': longitude,
                 'orientacion': orientacion,
+                'inclinacion': inclinacion,
                 'tipo_medida' : "SVF",
                 'valor_medida':valor_medida,
             }
+            header = {
+                 'token':token
+
+            }
 
             # Realizar la solicitud POST
-            r = requests.post(url, data=entrada)
+            r = requests.post(url, data=entrada,headers=header)
             print(r.text)
             
 
