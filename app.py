@@ -39,8 +39,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['PFP_UPLOAD_FOLDER'] = 'static/userpfp/'
 
-app.config['GOOGLE_ID'] = '480090602143-naqm1phl4lgn81pt44d0350omrr9rg3e.apps.googleusercontent.com'
-app.config['GOOGLE_SECRET'] = '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'
+app.config['GOOGLE_ID'] = 'GOOGLE_ID'
+app.config['GOOGLE_SECRET'] = 'GOOGLE_SECRET'
 
 
 
