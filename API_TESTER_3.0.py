@@ -9,16 +9,16 @@ import cv2
 
 from datetime import datetime
 
-url = 'http://127.0.0.1:5000/addData'
-
+url = 'http://photovolta.pythonanywhere.com/addData'
+1
 #Envio de forma manual
 
 
 
-id_sensor = 1234
-token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NDMyMTIwNywianRpIjoiZjFiOGFlM2QtZDI5ZS00NjQ5LTk1MDEtMWM2NzI4YTk1M2I3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEyMzQiLCJuYmYiOjE2ODQzMjEyMDcsImV4cCI6MTY4NDMyMjEwN30.hFV7WijlWXsfAYMaJ0W9xNsdeZxcfTVmjnu8eTTuw4o"
+id_sensor = 7526
+token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NDMzMTc3MiwianRpIjoiNmFiZjQ2MjktMDQ5Yy00NGE4LTgzNzYtY2Y1MTU0NzIzMzEyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Ijc1MjYiLCJuYmYiOjE2ODQzMzE3NzIsImV4cCI6MTY4NDMzMjY3Mn0.MsF1nA8GPMqIhpVXajjlVXOkwQDzA04-xuc3LQCYl1g"
 
-lat = 40.58221
+lat = 30.58221
 lon = -4.7709
 
  # tamaño de la imagen

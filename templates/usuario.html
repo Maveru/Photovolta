@@ -10,7 +10,7 @@
 <head>
 	<title>Mi perfil</title>
 	<style>
-		
+
     form {
         display: flex;
         flex-direction: column;
@@ -18,8 +18,8 @@
         margin: 0 auto;
         vertical-align: text-top;
     }
-    
-    
+
+
 
 		.container {
 			max-width: 500px;
@@ -93,7 +93,7 @@
 		}
 
 		.delete-form {
-		
+
       vertical-align: middle;
 		}
     button {
@@ -146,7 +146,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	
+
 }
 
 .form-small label {
@@ -224,14 +224,34 @@ ul.mensajes {
   {% endwith %}
 	<div class="container">
 		<h2>{{ username }}</h2>
-		<img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
-		
+		{% if pfp.startswith("http") %}
+                <a href="{{pfp }}" target="_blank"><img src="{{ pfp }}" alt="Mi foto de perfil" class="profile-picture"></a>
+        {% else %}
+                <img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
+        {% endif %}
+
 		<div class="info">
             {% for sensor in sensores %}
             <p><strong>ID del sensor:</strong> {{ sensor.id_sensor }}</p>
             {% endfor %}
 		</div>
         <iframe src="{{ url_for('UserMaper', username=username) }}" width="100%" height="500"></iframe>
+
+		<h2>Logros</h2>
+		{% for insignia in insignias %}
+			{% for badge in badges %}
+				{% if insignia.name == badge.badge_id %}
+					
+						<img src="{{ url_for('static', filename=insignia.image_url) }}" alt="{{ insignia.name }}" width="100" height="100" title="{{ insignia.description }}">
+						
+					
+				{% endif %}
+			{% endfor %}
+		{% endfor %}
+
+
+
+
 
 	</div>
 </body>

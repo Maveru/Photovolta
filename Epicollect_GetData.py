@@ -12,37 +12,50 @@ import datetime
 
 
 
-
-def analyze_image(url):
-        # Descarga la imagen desde la URL
-        with urllib.request.urlopen(url) as url_response:
+def analyze_image(image_path_or_url):
+    # Verifica si la entrada es una URL o una ruta local
+    if image_path_or_url.startswith('http'):
+        with urllib.request.urlopen(image_path_or_url) as url_response:
             s = url_response.read()
         arr = np.asarray(bytearray(s), dtype=np.uint8)
-        # Convierte la imagen en una matrix
         img = cv2.imdecode(arr, -1)
-        
-        # Convierte la imagen a escala de grises
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    else:
+        img = cv2.imread(image_path_or_url, cv2.IMREAD_UNCHANGED)
+    # Convertir la imagen a escala de grises
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Aplicar umbralización para detectar el cielo
+    _, img_threshold = cv2.threshold(img_gray, 180, 255, cv2.THRESH_BINARY_INV)
+
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         
         # Crea un detector de bordes Canny
-        edges = cv2.Canny(gray, 100, 200)
+    edges = cv2.Canny(gray, 100, 200)
         
         # Aplica una transformación de Hough para detectar líneas
-        lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
         
         # Si se detectan líneas, es una imagen de suelo
-        if lines is not None:
+    score = 0
+    if lines is not None:
             # Calcula la puntuación en función de la uniformidad de la iluminación
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            blur = cv2.GaussianBlur(gray, (5, 5), 0)
-            laplacian = cv2.Laplacian(blur, cv2.CV_64F)
-            variance = np.var(laplacian)
-            score = max(0, min(10, (variance - 20) / 10 + 5))
-            return round(score, 2)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+        laplacian = cv2.Laplacian(blur, cv2.CV_64F)
+        variance = np.var(laplacian)
+        score = max(0, min(10, (variance - 20) / 10 + 5))
         
-        # Si no se detectan líneas, no es una imagen de suelo
-        else:
-            return 0
+
+    # Calcular el porcentaje de píxeles blancos (cielo) en relación al total
+    total_pixeles = img_threshold.shape[0] * img_threshold.shape[1]
+    pixeles_blancos = cv2.countNonZero(img_threshold)
+    porcentaje_svf = (pixeles_blancos / total_pixeles) 
+
+    if score > 8:
+        return 0
+    
+    return round(10*porcentaje_svf,2)
 
 
 def Epicollect_GetData():

@@ -2,8 +2,17 @@
 {% block title %}Login / Photovolta{% endblock %}
 {% block content %}
 <link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <style>
-	
+	.google-icon {
+      font-size: 24px;
+      vertical-align: middle;
+    }
+    .google-link {
+      display: inline-block;
+      text-decoration: none;
+      color: #000;
+    }
 	h2{
 		text-align: center;
 		
@@ -109,6 +118,9 @@
 							<input type="submit" id="send-signup" name="signup" value="Iniciar sesion" />
 							<p>¿No tienes cuenta aún? <a href="{{ url_for('signup') }}">Regístrate aquí</a></p>
 							
+							<a href="/GoogleLogin" class="google-link">
+								<i class="fab fa-google google-icon">g</i> Iniciar sesión con Google
+							  </a>
 						</form>
 				
 					

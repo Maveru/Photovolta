@@ -1,0 +1,153 @@
+{% extends "nav.html" %}
+{% block title %}Upload Data / Photovolta{% endblock %}
+{% block content %}
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
+
+<html>
+<head>
+	<title>Seleccionar Ubicación</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js"></script>
+	<style>
+    .container {
+			max-width: 600px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #fff;
+			box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+			border-radius: 2%;
+      color:black
+		}
+    label{
+      color:black
+    }
+		#mapid {
+            height: 300px;
+            width: 300px;
+            border: 2px solid rgb(255, 255, 255);
+            border-radius: 5px;
+            margin:auto;
+		}
+        .input-container label,
+        .input-container input {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 10px;
+        }
+
+        .input-container label {
+        width: 40px;
+        }
+        input[type="password"],input[type="text"],input[type="email"],input[type="date"],input[type="time"]{
+				
+					font-size: 16px;
+					font-weight: 700;
+					background-color: rgba(183, 255, 231, 0.61);
+					border: rgb(0, 0, 0);
+					border-color: black;
+					border-radius: 4px;
+				}
+				input,label,form{
+				color:black
+			}
+			input[type="submit"],button {
+					display: block;
+					width: 150px;
+					height: 40px;
+					margin-top: 20px;
+					font-size: 10px;
+					font-weight: 700;
+					color: #27df92;
+					background-color: #44afcf;
+					border: none;
+			}
+      button:hover{
+        background-color: #2e8bc0;
+			}
+      
+			input[type="submit"]:hover {
+				background-color: #2e8bc0;
+			}
+
+			/* Estilos para los mensajes flash */
+ul.mensajes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mensajes li {
+  margin: 0;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+.mensajes .success {
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+}
+
+.mensajes .error {
+  background-color: #f44336;
+  color: white;
+}
+
+.mensajes .warning {
+  background-color: #ff9800;
+  color: white;
+}
+
+.mensajes .info {
+  background-color: #2196F3;
+  color: white;
+}
+
+	</style>
+</head>
+<body>
+	{% with mensajes = get_flashed_messages(with_categories=true) %}
+	{% if mensajes %}
+	  <ul class="mensajes">
+		{% for categoria, mensaje in mensajes %}
+		  <li class="{{ categoria }}">{{ mensaje }}</li>
+		{% endfor %}
+	  </ul>
+	{% endif %}
+  {% endwith %}
+  <div class="container">
+    <form action="/uploadData" method="POST" enctype="multipart/form-data"> <!--porque manda imagen-->
+      
+      
+  
+          <div class="input-container">
+              <label for="fecha">Fecha:</label>
+              <input type="date" name="fecha" required>
+              <label for="hora">Hora:</label>
+              <input type="time" name="hora" required>
+            </div>
+          
+          
+      <label for="latitude">Latitud:</label>
+      <input type="text" id="latitude" name="latitude"  required>
+      <br>
+      <label for="longitude">Longitud:</label>
+      <input type="text" id="longitude" name="longitude"  required>
+
+    
+
+          <label for="fotografia">Fotografia:</label>
+          <input type="file" name="fotografia" required>
+          
+          <div> <input type="submit" value="Enviar"></div>
+      
+    </form>
+  </div>
+</body>
+</html>
+
+
+
+{% endblock %}

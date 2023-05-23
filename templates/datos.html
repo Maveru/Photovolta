@@ -1,4 +1,5 @@
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<noscript><link rel="stylesheet" href="static/css/noscript.css" /></noscript>
 
 
 {% extends "nav.html" %}
@@ -72,58 +73,96 @@
         background-color: #3e8e41; 
       }
     
+      .pagination {
+    background-color: rgba(40, 40, 90, 0);
+    padding: 10px;
+    border: 1px transparent #5192db;
+    border-radius: 2%;
+    box-shadow: 0 0 3px #23d3da;
+  }
+
+  .pagination a {
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    margin: 0 5px;
     
+  }
+  .pagination a:hover{
+    font-weight: bold;
+    color: rgb(2, 59, 124);
+  }
+
+  .pagination .current-page {
+    color: rgb(26, 113, 212);
+    font-weight: bold;
+    margin: 0 5px;
+  }
   </style>
  </head>
 
   <!-- Wrapper -->
    
       <!-- Main -->
- 
-      <body><title>Datos Epicollect</title>
+      <body>
+        <title>Datos Epicollect</title>
         <div id="wrapper2">
           <h1 class="title">Datos Epicollect</h1>
           <h2><a href="{{ url_for('uploaddata') }}">Subir Datos</a></h2>
           <button class="button" onclick="location.href='/descargar-dato_irradiancia'">Descargar datos Irradiancia</button>
           <button class="button" onclick="location.href='/descargar-dato_SVF'">Descargar datos SFV</button>
-            <table class ="centered">
-              <thead>
-                <tr>
-                  <!--<th>Usuario</th>-->
-                  <th>{% for i in range(6) %}&nbsp;{% endfor %}Fecha</th>
-                  <th>Hora</th>
-                  <th>Latitud</th>
-                  <th>Longitud</th>
-                  <th>Puntuación</th>
-                  <th>Imagen</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for entrada in DatosTabla %}
-                <tr>
-                  <!--<td>{{ entrada.username }}</td>-->
-                  <td>{{ entrada.fecha }}</td>
-                  <td>{{ entrada.hora }}</td>
-                  <td>{{ entrada.latitud}}</td>
-                  <td>{{ entrada.longitud }}</td>
-                  <td>{% for i in range(6) %}&nbsp;{% endfor %}{{ entrada.analisis }}</td> <!-- espacio en blanco para alinear-->
-                  <td> 
-                    {% if entrada.url.startswith("http") %}
-                      <a href="{{ entrada.url }}" target="_blank"><img src="{{ entrada.url }}" width="100" height="100" alt="Imagen"></a>
-                      {% else %}
-                      <img src="{{ entrada.url }}" width="100" height="100" alt="Imagen" onclick="window.open('{{ entrada.url }}', '_blank')">
-
-                        
-                      {% endif %} 
-                    </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+          <table class="centered">
+            <thead>
+              <tr>
+                <!--<th>Usuario</th>-->
+                <th>{% for i in range(6) %}&nbsp;{% endfor %}Fecha</th>
+                <th>Hora</th>
+                <th>Puntuación</th>
+                <th>Imagen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entrada in DatosTabla %}
+              <tr>
+                <!--<td>{{ entrada.username }}</td>-->
+                <td>{{ entrada.fecha }}</td>
+                <td>{{ entrada.hora }}</td>
+                <td>{% for i in range(6) %}&nbsp;{% endfor %}{{ entrada.analisis }}</td> <!-- espacio en blanco para alinear-->
+                <td> 
+                  {% if entrada.url.startswith("http") %}
+                    <a href="{{ entrada.url }}" target="_blank"><img src="{{ entrada.url }}" width="100" height="100" alt="Imagen"></a>
+                  {% else %}
+                  <img src="{{url_for('static',filename=entrada.url)}}" width="100" height="100" alt="Imagen" onclick="window.open('{{ entrada.url }}', '_blank')">
+                  {% endif %} 
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+       
+          {% for i in range(6) %}&nbsp;{% endfor %} 
+        
+          <div class="pagination">
+            {% if page > 1 %}
+              <a href="{{ url_for('data', page=page-1) }}">Página anterior</a>
+            {% endif %}
+      
+            {% for num in range(1, total_pages+1) %}
+              {% if num == page %}
+                <span class="current-page">{{ num }}</span>
+              {% else %}
+                <a href="{{ url_for('data', page=num) }}">{{ num }}</a>
+              {% endif %}
+            {% endfor %}
+      
+            {% if page < total_pages %}
+            <a href="{{ url_for('data', page=page+1) }}">Página siguiente</a>
+            {% endif %}
+          </div>
         </div>
       </body>
- 
 </html>
+
+
     
 
   

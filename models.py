@@ -1,14 +1,14 @@
 import db
 import enum
 
-from sqlalchemy import Column, Integer, String, Float,ForeignKey,Enum
+from sqlalchemy import Column, Integer, String, Float,ForeignKey,Enum,Table
+from sqlalchemy.orm import relationship
 
 from datetime import datetime
 
 
-
 class User(db.Base):
-    __tablename__ = 'users'
+    __tablename__ = 'User'
 
     id = Column(Integer, primary_key=True)
     username = Column(String(15), nullable=False)
@@ -16,6 +16,7 @@ class User(db.Base):
     password = Column(String(50), nullable=False)
     score = Column(Float, nullable=False)
     profile_picture = Column(String(200), nullable=False)
+    badges = relationship('UserBadge', backref='user')
 
     def __init__(self, username, email,password,profile_picture):
         self.username = username
@@ -26,6 +27,27 @@ class User(db.Base):
 
     def __repr__(self):
         return f"<User {self.id}>"
+    
+
+class Badge(db.Base):
+    __tablename__ = 'Badge'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    image_url = Column(String(200))
+    descipcion = Column(String(200))
+    users = relationship('UserBadge', backref='badge')
+
+
+class UserBadge(db.Base):
+    __tablename__ = 'UserBadge'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('User.id'), nullable=False)
+    badge_id = Column(Integer, ForeignKey('Badge.id'), nullable=False)
+
+
+
+
 
 class Comment(db.Base):
     __tablename__ = 'comment'

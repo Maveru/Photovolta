@@ -28,3 +28,9 @@ Cambios secundarios:
 -Autenticacion sensores
 -Se puede acceder a los perfiles de
 otros usuarios desde LeaderBoards
+
+13/5/2023
+
+-Paginas dinamicas
+-Gamificacion con logros
+-Registro con google

@@ -7,7 +7,7 @@
 <head>
 	<title>Mi perfil</title>
 	<style>
-		
+
     form {
         display: flex;
         flex-direction: column;
@@ -15,8 +15,8 @@
         margin: 0 auto;
         vertical-align: text-top;
     }
-    
-    
+
+
 
 		.container {
 			max-width: 1000px;
@@ -90,7 +90,7 @@
 		}
 
 		.delete-form {
-		
+
       vertical-align: middle;
 		}
     button {
@@ -147,7 +147,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	
+
 }
 
 .form-small label {
@@ -271,9 +271,14 @@ ul.mensajes {
         <div class="vertical-item">
 			<div class="info">
 				<h2><strong>{{ username }}</strong> </h2>
-				
+
 			</div>
-            <img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
+			{% if pfp.startswith("http") %}
+                <a href="{{pfp }}" target="_blank"><img src="{{ pfp }}" alt="Mi foto de perfil" class="profile-picture"></a>
+            {% else %}
+                <img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
+            {% endif %}
+
             <form action="{{ url_for('perfil') }}" method="post" enctype="multipart/form-data" class="form-small">
                 <label for="profile_picture">Seleccionar foto de perfil</label>
                 <input type="file" name="profile_picture" id="profile_picture">
@@ -289,8 +294,22 @@ ul.mensajes {
 			<p><strong>Correo electrónico:</strong> {{ email }}</p>
 			<p><strong>Puntuación actual:</strong> {{ score }} puntos</p>
 		</div>
-        
     </div>
+	<ul>
+		{% for insignia in insignias %}
+			{% for badge in badges %}
+				{% if insignia.name == badge.badge_id %}
+					
+				<img src="{{ url_for('static', filename=insignia.image_url) }}" alt="{{ insignia.name }}" width="100" height="100" title="{{ insignia.description }}">
+						
+					
+				{% endif %}
+			{% endfor %}
+		{% endfor %}
+	</ul>
+	
+
+
 	<div class="button-container">
 		<form action="{{ url_for('device', username=username) }}" method="post">
 			<button type="submit">Mis dispositivos</button>

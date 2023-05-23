@@ -21,7 +21,7 @@ from folium.plugins import HeatMap, MiniMap, MousePosition
 
 import base64
 
-from models import DatoPersona,DatoSensor,TipoMedidaEnum,SensorAUT
+from models import DatoPersona,DatoSensor,TipoMedidaEnum,SensorAUT, User
 import db
 
 from PIL import Image
@@ -64,9 +64,20 @@ def analyze_image(image_path_or_url):
         img = cv2.imdecode(arr, -1)
     else:
         img = cv2.imread(image_path_or_url, cv2.IMREAD_UNCHANGED)
-    
+    # Convertir la imagen a escala de grises
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Aplicar umbralización para detectar el cielo
+    _, img_threshold = cv2.threshold(img_gray, 150, 255, cv2.THRESH_BINARY_INV)
+
+    # Calcular el porcentaje de píxeles blancos (cielo) en relación al total
+    total_pixeles = img_threshold.shape[0] * img_threshold.shape[1]
+    pixeles_blancos = cv2.countNonZero(img_threshold)
+    porcentaje_svf = (pixeles_blancos / total_pixeles) 
+
+    return round(10*porcentaje_svf,2)
     # Continúa con el procesamiento de la imagen
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+""" gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 100, 200)
     lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
     if lines is not None:
@@ -77,7 +88,8 @@ def analyze_image(image_path_or_url):
         score = max(0, min(10, (variance - 20) / 10 + 5))
         return round(score, 2)
     else:
-        return 0
+        return 0"""
+
 
 
 
@@ -142,11 +154,13 @@ def MakeMap():
 
 #MakeMap()
 
-
+import os
 def MakeUserMap(usuario):
     print(TipoMedidaEnum)
     print("Creando Mapa...")
-
+    if os.path.exists('templates/usermap.html'):
+        os.remove('templates/usermap.html')
+    
     geolocator = Nominatim(user_agent="Photovolta")
     location = geolocator.geocode("Madrid, Spain")
     madrid_coords = [location.latitude, location.longitude]
@@ -163,6 +177,14 @@ def MakeUserMap(usuario):
                 #print(analyze_image(sensor.valor))
                 mapear(sensor.latitud, sensor.longitud,analyze_image(sensor.valor),sensor.timestamp,sensor.valor,capa_Imagenes_sensores)
             DatosSensores.append((sensor.latitud, sensor.longitud)) 
+
+    mail = db.session.query(User).filter_by(username = usuario).one().email
+
+    for entrada in db.session.query(DatoPersona).filter_by(username=mail).all():
+        #print("mapenaod")
+        DatosSensores.append((entrada.latitud, entrada.longitud)) 
+        mapear(entrada.latitud,entrada.longitud,analyze_image(entrada.url),entrada.hora,entrada.url,capa_Imagenes_sensores)
+    print(db.session.query(DatoPersona).filter_by(username=usuario).all())
   
     MapaImagen = HeatMap(data=DatosSensores,name = 'Sensores', radius=10)
     MapaImagen.add_to(madrid_map)
@@ -170,5 +192,5 @@ def MakeUserMap(usuario):
     mouse_position = MousePosition()
     mouse_position.add_to(madrid_map)
     folium.LayerControl().add_to(madrid_map)
-    madrid_map.save('templates/usermap.html')
-
+    filename = f'usermap_{usuario}.html'
+    madrid_map.save(f'templates/{filename}')
