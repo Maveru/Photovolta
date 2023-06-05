@@ -6,11 +6,13 @@ from werkzeug.security import check_password_hash,generate_password_hash
 from flask_session import Session
 from datetime import datetime
 from GraphMaker import GraphMaker
-from MapMaker import MakeMap,analyze_image,MakeUserMap
+from MapMaker import MakeMap,MakeUserMap
 from password_strength import PasswordPolicy
 from Epicollect_GetData import Epicollect_GetData
 from flask_jwt_extended import JWTManager
 
+
+from claves import claveTokens, GOOGLE_ID, GOOGLE_SECRET, admin_pass
 
 from badges import haversine
 
@@ -24,23 +26,27 @@ from sqlalchemy.orm.exc import NoResultFound
 import db
 import os
 from models import Comment,User,DatoSensor,DatoPersona,SensorAUT,Badge,UserBadge
-from bbdd_edit import EliminarDato
+#from bbdd_edit import EliminarDato
+
 
 from flask import send_file
 import json
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = '685b9e7b32a529df7051e23c4c490808f783e4abbc7ea933cdb502385d694ecf'  # Clave secreta para firmar los tokens JWT -- secrets.token_hex(32)
+app.config['JWT_SECRET_KEY'] = claveTokens  # Clave secreta para firmar los tokens JWT -- secrets.token_hex(32)
 jwt = JWTManager(app)
-app.secret_key = "clave_secreta"
+#app.secret_key = "clave_secreta" borrar
 UPLOAD_FOLDER = 'static/datosFoto/'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['PFP_UPLOAD_FOLDER'] = 'static/userpfp/'
 
-app.config['GOOGLE_ID'] = 'GOOGLE_ID'
-app.config['GOOGLE_SECRET'] = 'GOOGLE_SECRET'
+
+
+# Claves secretas necesarias para la API de Google
+app.config['GOOGLE_ID'] = GOOGLE_ID
+app.config['GOOGLE_SECRET'] = GOOGLE_SECRET
 
 
 
@@ -49,6 +55,12 @@ Session(app)
 
 sensores_autenticados = {}
 
+def getUser():
+    if 'username' in session:
+        username = session['username']
+        user = db.session.query(User).filter_by(username=username).first()
+        return user
+    return None
 
 def registrar_sensor(id_sensor):
     token = create_access_token(identity=id_sensor)
@@ -58,15 +70,24 @@ def registrar_sensor(id_sensor):
 
 @app.cli.command("create_badges")
 def create_badges():
-    
-    bronze_badge = Badge(name='Bronze Badge',image_url = "badges/bronze.png",descipcion = "Obtenida por conseguir 20 puntos")
-    silver_badge = Badge(name='Silver Badge',image_url = "badges/silver.png",descipcion = "Obtenida por conseguir 50 puntos")
-    gold_badge = Badge(name='Gold Badge',image_url = "badges/gold.png",descipcion = "Obtenida por conseguir 100 puntos")
-    travel_badge = Badge(name='Travel Badge',image_url = "badges/travel.png",descipcion = "Obtenida al enviar dos datos con mucha distancia")
-    perfectionist_badge=Badge(name='Perfectionist Badge',image_url = "badges/perfect.png",descipcion = "Obtenida al obtener la maxima puntuación en una medida")
-    db.session.add_all([bronze_badge, silver_badge, gold_badge,travel_badge,perfectionist_badge])
+    bronze_badge = Badge(name='Bronze Badge', image_url="badges/bronze.png", descipcion="Obtenida por conseguir 20 puntos")
+    silver_badge = Badge(name='Silver Badge', image_url="badges/silver.png", descipcion="Obtenida por conseguir 50 puntos")
+    gold_badge = Badge(name='Gold Badge', image_url="badges/gold.png", descipcion="Obtenida por conseguir 100 puntos")
+
+    bronze_colab = Badge(name='Bronze Collaboration Badge', image_url="badges/colabBro.png", descipcion="Obtenida por realizar 10 entradas manuales")
+    silver_colab = Badge(name='Silver Collaboration Badge', image_url="badges/colabSilver.png", descipcion="Obtenida por realizar 25 entradas manuales")
+    gold_colab = Badge(name='Gold Collaboration Badge', image_url="badges/colabGold.png", descipcion="Obtenida por realizar 50 entradas manuales")
+
+    bronze_future = Badge(name='Bronze Futuristic Badge', image_url="badges/futBro.png", descipcion="Obtenida por realizar 50 entradas mediante sensores")
+    silver_future = Badge(name='Silver Futuristic Badge', image_url="badges/futSilv.png", descipcion="Obtenida por realizar 100 entradas mediante sensores")
+    gold_future = Badge(name='Gold Futuristic Badge', image_url="badges/futGold.png", descipcion="Obtenida por realizar 200 entradas mediante sensores")
+
+    travel_badge = Badge(name='Travel Badge', image_url="badges/travel.png", descipcion="Obtenida al enviar dos datos con mucha distancia")
+    perfectionist_badge = Badge(name='Perfectionist Badge', image_url="badges/perfect.png", descipcion="Obtenida al obtener una puntuación sobresaliente")
+
+    db.session.add_all([bronze_badge, silver_badge, gold_badge, bronze_colab, silver_colab, gold_colab, bronze_future, silver_future, gold_future, travel_badge, perfectionist_badge])
     db.session.commit()
-    #print('Badges created successfully.')
+
 
 @app.cli.command("delete_badges")
 def delete_badges():
@@ -103,20 +124,52 @@ def assign_badge(NombreInsignia,usuario):
     print(f'Insignia "{badge.name}" asignada al usuario "{user.username}".')
 
 
+@app.cli.command("assignAll_badges")
+def assignAll_badges():
+    user = db.session.query(User).filter_by(username="marki").first()
+
+    badges = db.session.query(Badge).all()
+
+    for badge in badges:
+        assign_badge(badge.name,user.username)
+
+
 def badge_giver(usuario):
 
     user = db.session.query(User).filter_by(username=usuario).first()
     
-    if user.score >= 10 :
+    if user.score >= 20 :
         assign_badge('Bronze Badge',usuario)
     if user.score >= 50 :
         assign_badge('Silver Badge',usuario)
     if user.score >= 100 :
         assign_badge('Gold Badge',usuario)
 
+    nDatos = db.session.query(DatoPersona).filter_by(username=user.email).count()
+    if nDatos >= 10 :
+        assign_badge('Bronze Collaboration Badge',usuario)
+    if nDatos >= 25 :
+        assign_badge('Silver Collaboration Badge',usuario)
+    if nDatos >= 50 :
+        assign_badge('Gold Collaboration Badge',usuario)
+
+    sensorUser = db.session.query(SensorAUT).filter_by(username_asociado=user.username).all()
+
+    nFuture = 0
+    for sensor in sensorUser:
+        nFuture = nFuture + db.session.query(DatoSensor).filter_by(id_sensor=sensor.id_sensor).count()
+
+    if nFuture >= 50 :
+        assign_badge('Bronze Futuristic Badge',usuario)
+    if nFuture >= 100 :
+        assign_badge('Silver Futuristic Badge',usuario)
+    if nFuture >= 200 :
+        assign_badge('Gold Futuristic Badge',usuario)
+
+
     datosUser = db.session.query(DatoPersona).filter_by(username=user.email).all()
     for dato in datosUser:
-        if dato.analisis == 10:
+        if dato.analisis > 9:
             assign_badge('Perfectionist Badge',usuario)
             break
 
@@ -132,7 +185,12 @@ def badge_giver(usuario):
                 assign_badge('Travel Badge',usuario)
                 break
 
+@app.route('/example')
+def example():
 
+    variable = variable
+
+    return render_template('ejemplo.html',variable=variable)    
 
 
 @app.route('/')
@@ -151,7 +209,7 @@ def index():
 @app.route('/mapa')
 def mapa():
 
-    #Epicollect_GetData()
+    Epicollect_GetData()
     #Agregar codigo
     MakeMap()
     return render_template('mapa.html')
@@ -173,35 +231,38 @@ def graficas():
 
 @app.route('/datos/<int:page>')
 def data(page=1):
-    Epicollect_GetData()
-    # DatosTabla = db.session.query(DatoPersona).order_by(func.substr(DatoPersona.fecha, 6, 2) + '-' + func.substr(DatoPersona.fecha, 9, 2)).all()
-    per_page = 10
-    total_entries = db.session.query(DatoPersona).count()
-    total_pages = total_entries // per_page + (total_entries % per_page > 0)
-    offset = (page - 1) * per_page
-    DatosTabla = db.session.query(DatoPersona).order_by(DatoPersona.analisis.desc()).offset(offset).limit(per_page).all()
-    return render_template('datos.html', DatosTabla=DatosTabla, page=page, total_pages=total_pages)
+    user = getUser()
+    if user is not None:
+        Epicollect_GetData()
+        per_page = 10
+        total_entries = db.session.query(DatoPersona).count()
+        total_pages = total_entries // per_page + (total_entries % per_page > 0)
+        offset = (page - 1) * per_page
+        DatosTabla = db.session.query(DatoPersona).filter_by(username=user.email).order_by(DatoPersona.analisis.desc()).offset(offset).limit(per_page).all()
+        return render_template('datos.html', DatosTabla=DatosTabla, page=page, total_pages=total_pages)
+    else:
+        return redirect(url_for('login'))
 
+from Score import AsignarPuntos
 
 @app.route('/leaderboard')
 def leaderboard():
     #Epicollect_GetData()
     users = db.session.query(User).all()
+    logros = db.session.query(UserBadge).all()
+    insignias =  db.session.query(Badge).all()
 
     for user in users:
-        email = user.email
-
-        datosPuntos = db.session.query(DatoPersona).filter_by(username=email).all()
-        user.score = 0
-        for punto in datosPuntos:
-            user.score += punto.analisis
-            user.score = round(user.score, 2)
-
+        #user.score = 0
+        db.session.commit()
+        user.score = AsignarPuntos(user)
     db.session.commit()
+
+    
 
 
     Users = db.session.query(User).order_by(User.score.desc()).all() #ordena los usuarios de mayor a menor puntuacion
-    return render_template('leaderboard.html', Users=Users)
+    return render_template('leaderboard.html', Users=Users,logros=logros,insignias=insignias)
 
 @app.route('/admin',methods=['GET', 'POST'])
 def admin():
@@ -214,7 +275,7 @@ def admin():
         # El usuario no está autenticado, verificar la contraseña
         if request.method == 'POST':
             password = request.form['password']
-            if password == 'admin10':
+            if password == admin_pass:
                 session['authenticated'] = True
                 return redirect(url_for('admin'))
             else:
@@ -264,14 +325,6 @@ def admin_register():
 def adminSensor():
     if 'authenticated' in session:
         datos = db.session.query(DatoSensor).all()
-        if request.method == 'POST':
-
-            atributo = request.form['atributo'].strip()
-            valor = request.form['valor'].strip()
-            EliminarDato(DatoSensor, atributo, valor)
-            flash('Dato eliminado correctamente.', 'success')
-            session.pop('authenticated', None)
-            return redirect(url_for('admin'))
         return render_template('admin_sensor.html',datos=datos)
     else:
         return redirect(url_for('admin'))
@@ -281,27 +334,6 @@ def adminSensor():
 def adminUser():
     if 'authenticated' in session:
         datos = db.session.query(User).all()
-        if request.method == 'POST':
-
-            atributo = request.form['atributo'].strip()
-            valor = request.form['valor'].strip()
-
-
-            if atributo == 'username':
-                EliminarDato(Comment, 'username', valor)
-                EliminarDato(User, atributo, valor)
-            else:
-                user_eliminar = db.session.query(User).filter_by(email=valor).first()
-                print(user_eliminar)
-                if user_eliminar:
-                    EliminarDato(Comment, 'username', user_eliminar.username)
-                    EliminarDato(User, atributo, valor)
-            flash('Dato eliminado correctamente.', 'success')
-            session.clear()
-            session.pop('authenticated', None)
-
-
-            return redirect(url_for('admin'))
         return render_template('admin_users.html',datos=datos)
     else:
         return redirect(url_for('admin'))
@@ -311,14 +343,6 @@ def adminUser():
 def adminComment():
     if 'authenticated' in session:
         datos = db.session.query(Comment).all()
-        if request.method == 'POST':
-
-            atributo = request.form['atributo'].strip()
-            valor = request.form['valor'].strip()
-            EliminarDato(Comment, atributo, valor)
-            flash('Dato eliminado correctamente.', 'success')
-            session.pop('authenticated', None)
-            return redirect(url_for('admin'))
         return render_template('admin_comments.html',datos=datos)
     else:
         return redirect(url_for('admin'))
@@ -329,14 +353,6 @@ def adminComment():
 def adminHuman():
     if 'authenticated' in session:
         datos = db.session.query(DatoPersona).all()
-        if request.method == 'POST':
-
-            atributo = request.form['atributo'].strip()
-            valor = request.form['valor'].strip()
-            EliminarDato(DatoPersona, atributo, valor)
-            flash('Dato eliminado correctamente.', 'success')
-            session.pop('authenticated', None)
-            return redirect(url_for('admin'))
         return render_template('admin_humano.html',datos=datos)
     else:
         return redirect(url_for('admin'))
@@ -347,14 +363,6 @@ def adminHuman():
 def adminSensorsAUT():
     if 'authenticated' in session:
         datos = db.session.query(SensorAUT).all()
-        if request.method == 'POST':
-
-            atributo = request.form['atributo'].strip()
-            valor = request.form['valor'].strip()
-            EliminarDato(SensorAUT, atributo, valor)
-            flash('Dato eliminado correctamente.', 'success')
-            session.pop('authenticated', None)
-            return redirect(url_for('admin'))
         return render_template('admin_sensoresAUT.html',datos=datos)
     else:
         return redirect(url_for('admin'))
@@ -367,11 +375,9 @@ users= {}
 
 @app.route('/feedback', methods=['GET', 'POST'])
 def comment():
-    comentarios = db.session.query(Comment).all()
-
     if 'username' in session:
 
-        comentarios = db.session.query(Comment).order_by(Comment.date.desc()).all()
+        comentarios = db.session.query(Comment).filter_by(username = session['username']).order_by(Comment.date.desc()).all()
 
 
         if request.method == 'POST':
@@ -391,6 +397,22 @@ def comment():
     else:
         return redirect(url_for('login'))
 
+
+
+from flask import jsonify
+
+@app.route('/deleteComment', methods=['POST'])
+def deleteComment():
+    data = request.get_json()
+    comment_id = data.get('commentId')
+
+    comment = db.session.query(Comment).filter_by(id=comment_id).first()
+    if comment:
+        db.session.delete(comment)
+        db.session.commit()
+        return jsonify({'message': 'Comment deleted successfully', 'reload': True})
+    else:
+        return jsonify({'error': 'Comment not found'})
 
 
 
@@ -446,6 +468,15 @@ def signup():
     else:
         return render_template('signup.html')
 
+@app.route('/check_registration')
+def check_registration():
+    # Aquí puedes implementar tu lógica de verificación de registro
+    if 'username' in session:
+        is_registered = True  # Ejemplo de variable de registro
+    else:
+        is_registered = False
+    return jsonify({'isRegistered': is_registered})
+
 
 # Inicio de sesión
 @app.route('/login', methods=['GET', 'POST'])
@@ -481,29 +512,37 @@ def login():
     else:
         return render_template('login.html')
 
-@app.route('/profile/delete',methods=['POST'])
-def deleteProfile():
-
-    username = session['username']
-
-
-    user = db.session.query(User).filter_by(username=username).first()
-    print(f"Deleting user with username {user.username}")
-    db.session.delete(user)
-    if user.profile_picture != "userpfp/user-default.png":
-        if os.path.isfile(user.profile_picture):
-            os.remove(user.profile_picture)
-
-    comments = db.session.query(Comment).filter_by(username=username).all()
-    for comment in comments:
-        db.session.delete(comment)
-
-
-    db.session.commit()
-    session.clear()
-
-    session.pop('username', None)
-    return redirect(url_for('index'))
+#p.route('/profile/delete',methods=['POST'])~ Todo lo de borrar el perfil de usuario
+# deleteProfile():
+#
+# username = session['username']
+#
+#
+# user = db.session.query(User).filter_by(username=username).first()
+# print(f"Deleting user with username {user.username}")
+# db.session.delete(user)
+# if user.profile_picture != "userpfp/user-default.png":
+#     if os.path.isfile(user.profile_picture):
+#         os.remove(user.profile_picture)
+#
+# comments = db.session.query(Comment).filter_by(username=username).all()
+# for comment in comments:
+#     db.session.delete(comment)
+#
+# sensAUT = db.session.query(SensorAUT).filter_by(username_asociado=username).all()
+# for sens in sensAUT:
+#     db.session.delete(sens)
+#
+# db.session.commit()
+#
+#
+# filename = f'usermap_{username}.html'
+# url = "templates/" + filename
+# os.remove(url)
+# session.clear()
+#
+# session.pop('username', None)
+# return redirect(url_for('index'))
 
 @app.route('/logout',methods=['POST'])
 def logout():
@@ -522,16 +561,27 @@ def uploaddata():
         return redirect(url_for('login'))
 
 
+@app.route('/mostrar_mapa', methods=['POST'])
+def mostrar_mapa():
+
+    user = getUser()
+    if   user.show_map == 0:
+        user.show_map = 1
+    elif user.show_map == 1:
+        user.show_map = 0
+    
+    db.session.commit()
+    return redirect(url_for('perfil'))
 
 
 @app.route('/profile',methods=['GET','POST'])
 def perfil():
     if 'username' in session:
         mensajes = get_flashed_messages(with_categories=True)
-        username = session['username']
 
-        user = db.session.query(User).filter_by(username=username).first()
-        email = user.email
+        user = getUser()
+
+
         if request.method == 'POST':
         # Manejar la carga de la imagen
             file = request.files['profile_picture']
@@ -550,23 +600,16 @@ def perfil():
                 flash('La foto de perfil se ha actualizado correctamente.', 'success')
                 return redirect(url_for('perfil'))
         # Obtener los datos del usuario de la sesión
-
-        
-        datosPuntos = db.session.query(DatoPersona).filter_by(username=email).all()
-        user.score = 0
-        for punto in datosPuntos:
-            user.score = user.score + punto.analisis
-
-     
-        score = round(user.score,2)
+        user.score = AsignarPuntos(user)
+         
         db.session.commit()
-        badge_giver(username)
-        badges = db.session.query(UserBadge).filter_by(user_id=username).all()
+        badge_giver(user.username)
+        badges = db.session.query(UserBadge).filter_by(user_id=user.username).all()
         insignias =  db.session.query(Badge).all()
         
 
         # Pasar los datos del usuario a la plantilla
-        return render_template('profile.html', username=username, email=email,score=score,pfp=user.profile_picture,mensajes=mensajes,badges=badges,insignias = insignias)
+        return render_template('profile.html', user=user,mensajes=mensajes,badges=badges,insignias = insignias)
     else:
         # Si el usuario no ha iniciado sesión, redirigir a la página de inicio de sesión
         return redirect(url_for('login'))
@@ -582,6 +625,8 @@ def UserMaper(username):
 
     return render_template(f'usermap_{username}.html')
 
+
+
 @app.route('/profile/<username>',methods=['GET'])
 def usuario(username):
     perfil = obtener_perfil(username)
@@ -591,10 +636,10 @@ def usuario(username):
         if session['username'] == perfil.username:
             return redirect(url_for('perfil'))
 
-    badges = db.session.query(UserBadge).filter_by(user_id=username).all()
+    logros = db.session.query(UserBadge).filter_by(user_id=username).all()
     insignias =  db.session.query(Badge).all()
 
-    return render_template('usuario.html', username=perfil.username,pfp=perfil.profile_picture,sensores=sensores,badges=badges,insignias = insignias)
+    return render_template('usuario.html', perfil = perfil,sensores=sensores,logros=logros,insignias = insignias)
 
 @app.route('/device/<username>',methods=['GET','POST'])
 def device(username):
@@ -609,25 +654,30 @@ def device(username):
 
 @app.route('/device/register',methods=['GET','POST'])
 def deviceregister():
-
+        mensajes = get_flashed_messages(with_categories=True)
         if request.method == 'POST':
-            sensor_id = request.form['sensor_id']
+            
+            user = getUser()
 
-            if not sensor_id.isdigit() or len(sensor_id) != 4 or sensor_id.startswith(('0')):
-                return "Error: id_sensor debe ser un número entero de 4 dígitos"
+            
+            
+            nSensor = db.session.query(SensorAUT).filter_by(username_asociado=user.username).count()
 
-            sensor = db.session.query(SensorAUT).filter_by(id_sensor=sensor_id).first()
-
-            if sensor is not None:
-                return "Error: Sensor ya registrado"
-            username_asociado = session['username']
-            token=registrar_sensor(sensor_id)
-            #print(token)
-            token_encriptado = generate_password_hash(token)
-            sensor_aut = SensorAUT(id_sensor=sensor_id,username_asociado=username_asociado,token=token_encriptado)
-            db.session.add(sensor_aut)
-            db.session.commit()
-
+            if nSensor < 3:
+                sensor_id = user.id * 1000 + (1 + nSensor )
+                username_asociado = user.username
+                token=registrar_sensor(sensor_id)
+                #print(token)
+                token_encriptado = generate_password_hash(token)
+                sensor_aut = SensorAUT(id_sensor=sensor_id,username_asociado=username_asociado,token=token_encriptado)
+                db.session.add(sensor_aut)
+                db.session.commit()
+                flash('Sensor registrado correctamente', 'success')
+            
+            else:
+                flash('Ya no puedes registrar más sensores', 'error')
+                return redirect(url_for('device', username=user.username))
+                
 
             # Crear el contenido del archivo JSON
             data = {
@@ -641,10 +691,12 @@ def deviceregister():
                 'Content-Disposition': f'attachment; filename=sensor_{sensor_id}.json',
                 'Content-Type': 'application/json'
             }
-            return datos_json, 200, headers
+            
+            return datos_json, 200, headers,
         else:
-
-            return render_template('registrarSensores.html')
+            return render_template('registrarSensores.html',mensajes=mensajes)
+        
+        
 import uuid
 @app.route('/uploadData', methods=['GET','POST']) #Para hacerlo desde la web
 def uploadData():
@@ -685,14 +737,13 @@ def uploadData():
             imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         ruta  = 'datosFoto/' + filename
-        print(ruta)
-        puntuacion = analyze_image(url)
+        
 
         print("El dato del usuario ha llegado correctamente")
         #Crea un diccionario para cada usuario
         origen = "Web"
 
-        Dato = DatoPersona(origen,username=email,fecha=fecha,hora=hora,latitud=latitud,longitud=longitud,analisis=puntuacion,url= ruta)
+        Dato = DatoPersona(origen,username=email,fecha=fecha,hora=hora,latitud=latitud,longitud=longitud,analisis=8,url= ruta)
         db.session.add(Dato)
         db.session.commit()
         flash('El dato ha sido insertado correctamente', 'success')
@@ -757,7 +808,7 @@ def authorized():
 
     else:
         pfp = userinfo.data['picture']
-
+        session['username'] = username
 
         datos = {
             'username':username,
@@ -768,7 +819,7 @@ def authorized():
         }
         url = 'http://photovolta.pythonanywhere.com/signup'
         requests.post(url, data=datos)
-        return redirect(url_for('login'))
+        return redirect(url_for('perfil'))
 
 
 @google.tokengetter
@@ -842,8 +893,8 @@ def addData():
             return "Error: solo se permiten archivos de imagen (jpg, jpeg, png)"
 
         valor.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-        Dato = DatoSensor(id_sensor=id_sensor,timestamp=timestamp,latitud=latitud,longitud=longitud,orientacion=orientacion,inclinacion=inclinacion,tipo_medida=tipo_medida,valor=os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        ruta  = 'datosFoto/' + filename
+        Dato = DatoSensor(id_sensor=id_sensor,timestamp=timestamp,latitud=latitud,longitud=longitud,orientacion=orientacion,inclinacion=inclinacion,tipo_medida=tipo_medida,valor=ruta)
         db.session.add(Dato)
         db.session.commit()
 

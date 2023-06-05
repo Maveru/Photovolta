@@ -209,15 +209,7 @@ ul.mensajes {
 }
 	</style>
 <body>
-	{% with mensajes = get_flashed_messages(with_categories=true) %}
-	{% if mensajes %}
-	  <ul class="mensajes">
-		{% for categoria, mensaje in mensajes %}
-		  <li class="{{ categoria }}">{{ mensaje }}</li>
-		{% endfor %}
-	  </ul>
-	{% endif %}
-  {% endwith %}
+
 	<div class="container">
 		<h2>Dispositivos de {{ username }} </h2>
 		<img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
@@ -232,6 +224,22 @@ ul.mensajes {
         
         <iframe src="/device/register" width="100%" height="180"></iframe>
 	</div>
+
+
+	<script>
+        // Función de recepción de mensajes del iframe
+        function receiveMessage(event) {
+            if (event.data === 'reloadPage') {
+                window.location.reload(); // Recargar la página principal
+                document.getElementById('deviceIframe').contentWindow.location.reload(); // Recargar el iframe
+            }
+        }
+
+        // Registrar el listener de mensajes
+        window.addEventListener('message', receiveMessage, false);
+    </script>
+
+
 </body>
 {% endblock %}
 </html>

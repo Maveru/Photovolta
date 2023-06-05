@@ -15,6 +15,7 @@ class User(db.Base):
     email = Column(String(80), nullable=False)
     password = Column(String(50), nullable=False)
     score = Column(Float, nullable=False)
+    show_map = Column(Integer, default=False)
     profile_picture = Column(String(200), nullable=False)
     badges = relationship('UserBadge', backref='user')
 

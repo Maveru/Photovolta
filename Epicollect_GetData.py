@@ -12,50 +12,75 @@ import datetime
 
 
 
-def analyze_image(image_path_or_url):
-    # Verifica si la entrada es una URL o una ruta local
-    if image_path_or_url.startswith('http'):
-        with urllib.request.urlopen(image_path_or_url) as url_response:
+def detectar_cielo(imagenURL):
+    # Convertir la imagen a escala de grises
+
+
+    
+    if imagenURL.startswith('http'):
+        with urllib.request.urlopen(imagenURL) as url_response:
             s = url_response.read()
         arr = np.asarray(bytearray(s), dtype=np.uint8)
         img = cv2.imdecode(arr, -1)
     else:
-        img = cv2.imread(image_path_or_url, cv2.IMREAD_UNCHANGED)
-    # Convertir la imagen a escala de grises
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Aplicar umbralización para detectar el cielo
-    _, img_threshold = cv2.threshold(img_gray, 180, 255, cv2.THRESH_BINARY_INV)
+        img = cv2.imread(imagenURL, cv2.IMREAD_UNCHANGED)
 
 
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
-        # Crea un detector de bordes Canny
-    edges = cv2.Canny(gray, 100, 200)
-        
-        # Aplica una transformación de Hough para detectar líneas
-    lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
-        
-        # Si se detectan líneas, es una imagen de suelo
-    score = 0
-    if lines is not None:
-            # Calcula la puntuación en función de la uniformidad de la iluminación
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        laplacian = cv2.Laplacian(blur, cv2.CV_64F)
-        variance = np.var(laplacian)
-        score = max(0, min(10, (variance - 20) / 10 + 5))
-        
+    imagen_gris = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # Calcular el porcentaje de píxeles blancos (cielo) en relación al total
-    total_pixeles = img_threshold.shape[0] * img_threshold.shape[1]
-    pixeles_blancos = cv2.countNonZero(img_threshold)
-    porcentaje_svf = (pixeles_blancos / total_pixeles) 
+    # Aplicar un umbral para obtener una imagen binaria
+    umbral = 200  # Ajusta este valor según sea necesario
+    _, imagen_binaria = cv2.threshold(imagen_gris, umbral, 255, cv2.THRESH_BINARY)
 
-    if score > 8:
-        return 0
+    # Encontrar contornos en la imagen binaria
+    contornos, _ = cv2.findContours(imagen_binaria, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Filtrar los contornos por área para eliminar posibles falsos positivos
+    area_minima = 1000  # Ajusta este valor según sea necesario
+    contornos_filtrados = [cnt for cnt in contornos if cv2.contourArea(cnt) > area_minima]
+
+    # Devolver los contornos filtrados
+    return contornos_filtrados
+
+
+def analyze_image(imagenURL):
+    # Convertir la imagen al espacio de color HSV
     
-    return round(10*porcentaje_svf,2)
+    
+    if len(detectar_cielo(imagenURL)) < 2:
+        return 0
+    else:
+
+        if imagenURL.startswith('http'):
+            with urllib.request.urlopen(imagenURL) as url_response:
+                s = url_response.read()
+            arr = np.asarray(bytearray(s), dtype=np.uint8)
+            img = cv2.imdecode(arr, -1)
+        else:
+            img = cv2.imread(imagenURL, cv2.IMREAD_UNCHANGED)
+
+
+        imagen_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+        # Definir el rango de azul en el espacio de color HSV
+        rango_azul_bajo = np.array([90, 50, 50])
+        rango_azul_alto = np.array([130, 255, 255])
+
+        # Aplicar una máscara para obtener solo los píxeles azules del cielo
+        mascara = cv2.inRange(imagen_hsv, rango_azul_bajo, rango_azul_alto)
+
+        # Contar el número de píxeles azules en la máscara
+        cantidad_pixeles_azules = np.sum(mascara == 255)
+
+        # Calcular el porcentaje de píxeles azules respecto al total
+        if img is not None:
+            total_pixeles = img.shape[0] * img.shape[1]
+        else:
+            total_pixeles = 0
+        porcentaje_azul = (cantidad_pixeles_azules / total_pixeles) * 100
+
+        # Devolver el porcentaje de píxeles azules
+        return round(0.1*porcentaje_azul,2)
 
 
 def Epicollect_GetData():

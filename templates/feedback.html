@@ -49,29 +49,39 @@
       }
 
       .comment {
-        margin-bottom: 30px;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #f8f8f8;
-        color: black
-      }
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  color: black;
+  position: relative; /* Agregamos la propiedad de posición relativa */
+}
 
-      .comment p {
-        margin-bottom: 5px;
-      }
+.comment p {
+  margin-bottom: 5px;
+}
 
-      .comment .username {
-        font-size: 20px;
-        font-weight: 700;
-        color: #143a63;
-      }
+.comment .username {
+  font-size: 20px;
+  font-weight: 700;
+  color: #143a63;
+}
 
-      .comment .date {
-        font-size: 14px;
-        font-weight: 400;
-        color: #999;
-      }
+.comment .date {
+  font-size: 14px;
+  font-weight: 400;
+  color: #999;
+}
+
+.comment .delete-icon {
+  position: absolute; /* Agregamos la propiedad de posición absoluta */
+  top: 10px; /* Ajusta la posición verticalmente según sea necesario */
+  right: 10px; /* Mueve el icono hacia la derecha */
+  color: #000000; /* Color del icono */
+  cursor: pointer;
+}
+
       .title{
         color: rgb(17, 17, 17);
        text-align: center;
@@ -83,6 +93,28 @@
 
  
       }
+
+      .delete-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: rgb(0, 0, 0);
+        font-size: 14px;
+        padding: 0;
+      }
+
+      .delete-button i {
+        font-size: 14px;
+        color: rgb(0, 0, 0);
+      }
+
+      .delete-button i:hover {
+        font-size: 14px;
+        color: rgb(255, 0, 0);
+      }
     </style>
   </head>
   <body><title>Sección de comentarios</title>
@@ -90,12 +122,17 @@
       <h1 class="title">Comentarios</h1>
 
       {% for comentario in comentarios %}
-        <div class="comment">
-          <p class="username">{{ comentario.username }}</p>
-          <p class="date">{{ comentario.date }}</p>
-          <p class="text">{{ comentario.comment }}</p>
-        </div>
-      {% endfor %}
+      <div class="comment">
+        <p class="username">{{ comentario.username }}</p>
+        <p class="date">{{ comentario.date }}</p>
+        <p class="text">{{ comentario.comment }}</p>
+        {% if comentario.username == username %}
+        <button class="delete-button" onclick="deleteComment('{{ comentario.id }}')">
+          <i class="fas fa-trash-alt"></i>
+        {% endif %}
+      </div>
+    {% endfor %}
+    
 
       <h3>Escribe tu comentario</h3>
       <form method="POST" action="{{ url_for('comment') }}">
@@ -106,5 +143,27 @@
   </body>
 </html>
 
+<script>
+  function deleteComment(commentId) {
+    fetch('/deleteComment', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ commentId: commentId })
+})
+.then(response => response.json())
+.then(data => {
+  if (data.reload) {
+    window.location.reload(); // Recargar la página
+  }
+})
+.catch(error => {
+  console.error('Error:', error);
+});
+
+  }
+  </script>
+  
 
 {% endblock %}

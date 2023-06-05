@@ -213,36 +213,30 @@ ul.mensajes {
 	</style>
 </head>
 <body>
-	{% with mensajes = get_flashed_messages(with_categories=true) %}
-	{% if mensajes %}
-	  <ul class="mensajes">
-		{% for categoria, mensaje in mensajes %}
-		  <li class="{{ categoria }}">{{ mensaje }}</li>
-		{% endfor %}
-	  </ul>
-	{% endif %}
-  {% endwith %}
+
 	<div class="container">
-		<h2>{{ username }}</h2>
-		{% if pfp.startswith("http") %}
-                <a href="{{pfp }}" target="_blank"><img src="{{ pfp }}" alt="Mi foto de perfil" class="profile-picture"></a>
+		<h2>{{ perfil.username }}</h2>
+		{% if perfil.profile_picture.startswith("http") %}
+                <a href="{{perfil.profile_picture }}" target="_blank"><img src="{{ perfil.profile_picture }}" alt="Mi foto de perfil" class="profile-picture"></a>
         {% else %}
-                <img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
+                <img src="{{ url_for('static', filename=perfil.profile_picture) }}" alt="Mi foto de perfil" class="profile-picture">
         {% endif %}
 
-		<div class="info">
-            {% for sensor in sensores %}
-            <p><strong>ID del sensor:</strong> {{ sensor.id_sensor }}</p>
-            {% endfor %}
-		</div>
-        <iframe src="{{ url_for('UserMaper', username=username) }}" width="100%" height="500"></iframe>
+	
+		{% if perfil.show_map == 1 %}
+        	<iframe src="{{ url_for('UserMaper', username=perfil.username) }}" width="100%" height="500"></iframe>
+		{% endif %}
 
+
+		{% if badge in logros %}
 		<h2>Logros</h2>
+		{% endif %}
+
 		{% for insignia in insignias %}
-			{% for badge in badges %}
+			{% for badge in logros %}
 				{% if insignia.name == badge.badge_id %}
 					
-						<img src="{{ url_for('static', filename=insignia.image_url) }}" alt="{{ insignia.name }}" width="100" height="100" title="{{ insignia.description }}">
+						<img src="{{ url_for('static', filename=insignia.image_url) }}" alt="{{ insignia.name }}" width="100" height="100" title="{{ insignia.descipcion }}">
 						
 					
 				{% endif %}

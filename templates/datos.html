@@ -104,12 +104,10 @@
    
       <!-- Main -->
       <body>
-        <title>Datos Epicollect</title>
+        <title>Mis Datos</title>
         <div id="wrapper2">
-          <h1 class="title">Datos Epicollect</h1>
-          <h2><a href="{{ url_for('uploaddata') }}">Subir Datos</a></h2>
-          <button class="button" onclick="location.href='/descargar-dato_irradiancia'">Descargar datos Irradiancia</button>
-          <button class="button" onclick="location.href='/descargar-dato_SVF'">Descargar datos SFV</button>
+          <h1 class="title">Mis Datos</h1>>
+          {% if DatosTabla is not none %}
           <table class="centered">
             <thead>
               <tr>
@@ -120,6 +118,7 @@
                 <th>Imagen</th>
               </tr>
             </thead>
+           
             <tbody>
               {% for entrada in DatosTabla %}
               <tr>
@@ -138,6 +137,9 @@
               {% endfor %}
             </tbody>
           </table>
+          {% else %}
+          <h1 class="title">No hay datos todavia :(</h1>
+          {% endif %}
        
           {% for i in range(6) %}&nbsp;{% endfor %} 
         
@@ -146,7 +148,7 @@
               <a href="{{ url_for('data', page=page-1) }}">Página anterior</a>
             {% endif %}
       
-            {% for num in range(1, total_pages+1) %}
+            {% for num in range(1, total_pages) %}
               {% if num == page %}
                 <span class="current-page">{{ num }}</span>
               {% else %}
@@ -154,7 +156,7 @@
               {% endif %}
             {% endfor %}
       
-            {% if page < total_pages %}
+            {% if page < total_pages-1 %}
             <a href="{{ url_for('data', page=page+1) }}">Página siguiente</a>
             {% endif %}
           </div>

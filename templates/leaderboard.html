@@ -12,7 +12,8 @@
     .centered {
       margin: auto;
       width: 10%;
-      text-align: center;
+      text-align:center;
+      vertical-align: auto;
       color:rgb(255, 255, 255);
     }
     .score-table {
@@ -79,6 +80,7 @@
           <tr>
             <th>Usuario</th>
             <th>Puntuación</th>
+            <th>Logros</th>
          
           </tr>
         </thead>
@@ -87,7 +89,22 @@
           <tr>
             <td class="user"><a href="{{ url_for('usuario', username=user.username) }}">{{ user.username }}</a></td>
             <td>{{ user.score}}</td>
-            
+            <td>
+            {% for logro in logros %}
+             {% if logro.user_id == user.username %}
+              {% for insignia in insignias %}
+               
+                  {% if insignia.name == logro.badge_id %}
+                  
+                  <img src="{{ url_for('static', filename=insignia.image_url) }}" alt="{{ insignia.name }}" width="70" height="70" title="{{ insignia.descipcion }}">
+                    
+                  
+                  {% endif %}
+                
+              {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </td>
           </tr>
           {% endfor %}
         </tbody>

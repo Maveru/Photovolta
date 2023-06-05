@@ -2,6 +2,15 @@
 {% block title %}Mapa / Photovolta{% endblock %}
 {% block content %}
 <link rel="shortcut icon" href="{{ url_for('static', filename='images/iconardo.png') }}">
+
+<style>#wrapper2 {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 15px;
+	background-color: #ffffff00;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }</style>
 <html>
   
 
@@ -20,9 +29,10 @@
 				}
 			</style>
         <iframe src="mapeado" width="75%" height="750"></iframe>
-		
-
-            
+		<div id="wrapper2"> <!--TEMPORAL-->
+			<button class="button" onclick="location.href='/descargar-dato_irradiancia'">Descargar datos Irradiancia</button>
+			<button class="button" onclick="location.href='/descargar-dato_SVF'">Descargar datos SFV</button>
+		</div>
 	</body>
 </html>
 

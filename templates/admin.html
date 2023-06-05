@@ -27,8 +27,11 @@
     <h1>Panel de Administración</h1>
     <form action="/admin" method="POST">
         
+     
+    
       <label for="password">Contraseña de Administrador:</label>
       <input type="password" name="password" id="password" required><br><br>
+    
     {% with mensajes = get_flashed_messages(with_categories=true) %}
 	{% if mensajes %}
 	  <ul class="mensajes">
@@ -41,10 +44,10 @@
     {% if session.authenticated %}
     
     
-    <button onclick="location.href='/admin/DatoSensor'">Base de datos de sensores</button>
-    <button onclick="location.href='/admin/DatoPersona'">Base de datos de personas</button>
-    <button onclick="location.href='/admin/comentarios'">Base de datos de comentarios</button>
-    <button onclick="location.href='/admin/users'">Base de datos de usuarios</button>
+    <button onclick="location.href='/admin/DatoSensor'">Entradas realizadas por sensores</button>
+    <button onclick="location.href='/admin/DatoPersona'">Entradas realizadas por usuarios</button>
+    <button onclick="location.href='/admin/comentarios'">Comentarios</button>
+    <button onclick="location.href='/admin/users'">Usuarios registrados</button>
     <button onclick="location.href='/admin/sensoresAUT'">Sensores Autenticados</button>
     {% endif %}
     <h1>  <a href="/">Salir</a> </h1>

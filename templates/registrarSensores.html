@@ -3,14 +3,61 @@
 <head>
     <title>Panel de Administración</title>
 </head>
+
+<style>
+    			/* Estilos para los mensajes flash */
+ul.mensajes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mensajes li {
+  margin: 0;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+.mensajes .success {
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+}
+
+.mensajes .error {
+  background-color: #f44336;
+  color: white;
+}
+
+.mensajes .warning {
+  background-color: #ff9800;
+  color: white;
+}
+
+.mensajes .info {
+  background-color: #2196F3;
+  color: white;
+}
+</style>
 <body>
     <h2>Aqui puedes añadir dispositivos</h2>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+	{% if mensajes %}
+	  <ul class="mensajes">
+		{% for categoria, mensaje in mensajes %}
+		  <li class="{{ categoria }}">{{ mensaje }}</li>
+		{% endfor %}
+	  </ul>
+	{% endif %}
+  {% endwith %}
+
+
     <form action="/device/register" method="POST" target="_parent">
         
-        <label for="sensor_id">Identificador del sensor:</label>
-        <input type="text" name="sensor_id" id="sensor_id" required><br><br>
+        <label for="sensor_id"></label>
         
-        <input type="submit" value="Enviar">
+        <input type="submit" value="Registrar un nuevo sensor (máximo 3)">
     </form>
 
 </body>

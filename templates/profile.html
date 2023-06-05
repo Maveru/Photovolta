@@ -98,10 +98,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: #9f4bcf;
+		background-color: #4b84cf;
 		}
 	button:hover{
-		background-color: #7304b3;
+		background-color: #4dacd1;
 	}
 		input[type="submit"] {
     background-color: #4bcfc9;
@@ -253,6 +253,115 @@ ul.mensajes {
     justify-content: center;
 }
 
+/* Estilos del interruptor (toggle switch) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+/* Estilo para ocultar el formulario del interruptor */
+/* Estilos personalizados para el formulario del interruptor */
+.button2{
+	background-color: transparent;
+    border: none;
+	box-shadow: none;
+
+}
+.switch-form {
+    background-color: transparent;
+    border: none;
+	box-shadow: none;
+    padding: 0;
+    margin: 0;
+}
+
+.switch-form .switch {
+    margin: 0;
+}
+
+.switch-form .slider {
+    background-color: #ccc;
+    /* Estilos adicionales para el switch */
+}
+
+.switch-form .slider:before {
+    background-color: white;
+    /* Estilos adicionales para el switch antes de */
+}
+
+.switch-container {
+			display: flex;
+			align-items: center;
+		}
+
+.switch-form {
+			margin-left: 20px;
+			display: flex;
+			align-items: center;
+		}
+
+.switch-description {
+			margin-left: 10px;
+		}
+
+.button-container {
+			display: flex;
+			justify-content: space-between;
+		}
+
 
 	</style>
 </head>
@@ -270,13 +379,13 @@ ul.mensajes {
     <div class="vertical-container">
         <div class="vertical-item">
 			<div class="info">
-				<h2><strong>{{ username }}</strong> </h2>
+				<h2><strong>{{user.username }}</strong> </h2>
 
 			</div>
-			{% if pfp.startswith("http") %}
-                <a href="{{pfp }}" target="_blank"><img src="{{ pfp }}" alt="Mi foto de perfil" class="profile-picture"></a>
+			{% if user.profile_picture .startswith("http") %}
+                <a href="{{user.profile_picture }}" target="_blank"><img src="{{ user.profile_picture  }}" alt="Mi foto de perfil" class="profile-picture"></a>
             {% else %}
-                <img src="{{ url_for('static', filename=pfp) }}" alt="Mi foto de perfil" class="profile-picture">
+                <img src="{{ url_for('static', filename=user.profile_picture ) }}" alt="Mi foto de perfil" class="profile-picture">
             {% endif %}
 
             <form action="{{ url_for('perfil') }}" method="post" enctype="multipart/form-data" class="form-small">
@@ -284,23 +393,45 @@ ul.mensajes {
                 <input type="file" name="profile_picture" id="profile_picture">
                 <input type="submit" value="Guardar cambios">
             </form>
+			
         </div>
+
+		
         <div class="vertical-item">
-			<iframe src="{{ url_for('UserMaper', username=username) }}" width="400px" height="400"></iframe>
+			<iframe src="{{ url_for('UserMaper', username=user.username) }}" width="400px" height="400"></iframe>
+			
         </div>
+		
+	
+
+		
+		
     </div>
     <div class="horizontal-container">
 		<div class="info">
-			<p><strong>Correo electrónico:</strong> {{ email }}</p>
-			<p><strong>Puntuación actual:</strong> {{ score }} puntos</p>
+			<strong>Mostrar mapa al resto de usuarios:</strong>
+			<p><strong>Correo electrónico:</strong> {{ user.email }}</p>
+			<p><strong>Puntuación actual:</strong> {{ user.score }} puntos</p>
+			<form action="{{ url_for('uploaddata') }}" method="get" class="button2">
+				<button type="submit">Subir Datos</button>
+			</form>
+				
 		</div>
+		<form method="POST" action="{{ url_for('mostrar_mapa') }}" class="switch-form">
+			<div class="switch-container"></div>
+			<label class="switch">
+				
+				<input type="checkbox" name="show_map" onchange="this.form.submit()" {% if user.show_map %}checked{% endif %}>
+				<span class="slider round"></span>
+			</label>
+		</form>
     </div>
 	<ul>
 		{% for insignia in insignias %}
 			{% for badge in badges %}
 				{% if insignia.name == badge.badge_id %}
 					
-				<img src="{{ url_for('static', filename=insignia.image_url) }}" alt="{{ insignia.name }}" width="100" height="100" title="{{ insignia.description }}">
+				<img src="{{ url_for('static', filename=insignia.image_url) }}" alt="{{ insignia.name }}" width="80" height="80" title="{{ insignia.descipcion }}">
 						
 					
 				{% endif %}
@@ -310,16 +441,23 @@ ul.mensajes {
 	
 
 
+
+
 	<div class="button-container">
-		<form action="{{ url_for('device', username=username) }}" method="post">
+		<form action="{{ url_for('device', username=user.username ) }}" method="post">
 			<button type="submit">Mis dispositivos</button>
+		</form>
+		<form action="{{ url_for('comment') }}" method="get">
+			<button type="submit">Comentarios</button>
+		</form>
+		<form action="{{ url_for('data',page=1) }}" method="get">
+			<button type="submit">Mis Datos</button>
 		</form>
 		<form class="logout-form" action="{{ url_for('logout') }}" method="post">
 			<button type="submit">Cerrar sesión</button>
 		</form>
-		<form class="delete-form" action="{{ url_for('deleteProfile') }}" method="POST">
-			<button type="submit" onclick="confirm('¿Estás seguro de que quieres eliminar tu cuenta? Se borrarán todos tus comentarios y perderás tus puntos')">Eliminar cuenta</button>
-		</form>
+		
+		
 	</div>
 </div>
 

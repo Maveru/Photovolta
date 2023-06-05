@@ -1,16 +1,8 @@
 
-
-#import matplotlib.pyplot as plt
-#import matplotlib.image as mpimg
-
-import urllib.request
-
 import numpy as np
 
 import webbrowser
 import requests
-
-import cv2
 
 import datetime
 
@@ -37,12 +29,13 @@ def mapear(long,latt,mensaje,texto,imagen_path,capa):
         
         #Depende si la imagen esta en local o es una url
         try: 
-            imagen = open(imagen_path, 'rb')
-            imagen_bytes = imagen.read()
-            imagen_base64 = base64.b64encode(imagen_bytes).decode()
-        except:
             imagen_respuesta = requests.get(imagen_path)
             imagen_base64 = base64.b64encode(imagen_respuesta.content).decode()
+           
+        except:
+            imagen = open('static/' + imagen_path, 'rb')
+            imagen_bytes = imagen.read()
+            imagen_base64 = base64.b64encode(imagen_bytes).decode()
 
 
         popup_html = f'<div style="text-align:center;"><p>{texto}</p><img src="data:image/jpeg;base64,{imagen_base64}" style="max-width: 200px; max-height: 200px;">'
@@ -51,48 +44,6 @@ def mapear(long,latt,mensaje,texto,imagen_path,capa):
         marcador = folium.Marker(location=[long, latt], popup=popup, icon=folium.Icon(color=color))
 
         marcador.add_to(capa)
-
-
-
-
-def analyze_image(image_path_or_url):
-    # Verifica si la entrada es una URL o una ruta local
-    if image_path_or_url.startswith('http'):
-        with urllib.request.urlopen(image_path_or_url) as url_response:
-            s = url_response.read()
-        arr = np.asarray(bytearray(s), dtype=np.uint8)
-        img = cv2.imdecode(arr, -1)
-    else:
-        img = cv2.imread(image_path_or_url, cv2.IMREAD_UNCHANGED)
-    # Convertir la imagen a escala de grises
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Aplicar umbralización para detectar el cielo
-    _, img_threshold = cv2.threshold(img_gray, 150, 255, cv2.THRESH_BINARY_INV)
-
-    # Calcular el porcentaje de píxeles blancos (cielo) en relación al total
-    total_pixeles = img_threshold.shape[0] * img_threshold.shape[1]
-    pixeles_blancos = cv2.countNonZero(img_threshold)
-    porcentaje_svf = (pixeles_blancos / total_pixeles) 
-
-    return round(10*porcentaje_svf,2)
-    # Continúa con el procesamiento de la imagen
-""" gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 100, 200)
-    lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
-    if lines is not None:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        laplacian = cv2.Laplacian(blur, cv2.CV_64F)
-        variance = np.var(laplacian)
-        score = max(0, min(10, (variance - 20) / 10 + 5))
-        return round(score, 2)
-    else:
-        return 0"""
-
-
-
-
 
 def MakeMap():
     print(TipoMedidaEnum)
@@ -128,8 +79,8 @@ def MakeMap():
         #mapear(entrada.latitud,entrada.longitud,entrada.analisis,entrada.hora,entrada.url,capa_marcadores)
         if entrada.tipo_medida == TipoMedidaEnum("fotografia"):
             print("estas mapeando una imagen")
-            print(analyze_image(entrada.valor))
-            mapear(entrada.latitud, entrada.longitud,analyze_image(entrada.valor),entrada.timestamp,entrada.valor,capa_Imagenes_sensores)
+            
+            mapear(entrada.latitud, entrada.longitud,5,entrada.timestamp,entrada.valor,capa_Imagenes_sensores)
         DatosSensores.append((entrada.latitud, entrada.longitud)) # Añadir los valores a la lista como una tupl
     #mapear(long,latt,mensaje,texto,imagen_path,capa):
 
@@ -174,16 +125,16 @@ def MakeUserMap(usuario):
        
             if sensor.tipo_medida == TipoMedidaEnum("fotografia"):
            
-                #print(analyze_image(sensor.valor))
-                mapear(sensor.latitud, sensor.longitud,analyze_image(sensor.valor),sensor.timestamp,sensor.valor,capa_Imagenes_sensores)
+                
+                mapear(sensor.latitud, sensor.longitud,8,sensor.timestamp,sensor.valor,capa_Imagenes_sensores)
             DatosSensores.append((sensor.latitud, sensor.longitud)) 
 
     mail = db.session.query(User).filter_by(username = usuario).one().email
 
     for entrada in db.session.query(DatoPersona).filter_by(username=mail).all():
-        #print("mapenaod")
+        
         DatosSensores.append((entrada.latitud, entrada.longitud)) 
-        mapear(entrada.latitud,entrada.longitud,analyze_image(entrada.url),entrada.hora,entrada.url,capa_Imagenes_sensores)
+        mapear(entrada.latitud,entrada.longitud,8,entrada.hora,entrada.url,capa_Imagenes_sensores)
     print(db.session.query(DatoPersona).filter_by(username=usuario).all())
   
     MapaImagen = HeatMap(data=DatosSensores,name = 'Sensores', radius=10)
