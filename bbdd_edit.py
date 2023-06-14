@@ -27,6 +27,6 @@ def LimpiarBase(Bbdd):
         db.session.commit()
     print("Base de datos limpia")    
 
-EliminarDato(DatoSensor, "id_sensor", 1234)
+EliminarDato(DatoPersona, "origen", "Web")
 #LimpiarBase(DatoPersona)
 

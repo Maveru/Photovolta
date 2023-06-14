@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_ac588439350db85da2964f3a54e92105 {
+                #map_ea05cec060af68ee4872d67d8ef49e02 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -42,14 +42,14 @@
 <body>
     
     
-            <div class="folium-map" id="map_ac588439350db85da2964f3a54e92105" ></div>
+            <div class="folium-map" id="map_ea05cec060af68ee4872d67d8ef49e02" ></div>
         
 </body>
 <script>
     
     
-            var map_ac588439350db85da2964f3a54e92105 = L.map(
-                "map_ac588439350db85da2964f3a54e92105",
+            var map_ea05cec060af68ee4872d67d8ef49e02 = L.map(
+                "map_ea05cec060af68ee4872d67d8ef49e02",
                 {
                     center: [40.4167047, -3.7035825],
                     crs: L.CRS.EPSG3857,
@@ -63,48 +63,48 @@
 
         
     
-            var tile_layer_8ac35392a22600df2645a9b9affbf150 = L.tileLayer(
+            var tile_layer_65ae75f152ed4ecdb292302950a6cb3a = L.tileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
-            ).addTo(map_ac588439350db85da2964f3a54e92105);
+            ).addTo(map_ea05cec060af68ee4872d67d8ef49e02);
         
     
-            var heat_map_0fadab9c82ba6eabe8c95bd67b0c138a = L.heatLayer(
+            var heat_map_c385b570d4d5165d92400b5a81d1f471 = L.heatLayer(
                 [],
                 {"blur": 15, "maxZoom": 18, "minOpacity": 0.5, "radius": 10}
-            ).addTo(map_ac588439350db85da2964f3a54e92105);
+            ).addTo(map_ea05cec060af68ee4872d67d8ef49e02);
         
     
-            var feature_group_8b254f90589948b961580e17209e7b77 = L.featureGroup(
+            var feature_group_18a97151505fad55d54f4f7bf2f8361e = L.featureGroup(
                 {}
-            ).addTo(map_ac588439350db85da2964f3a54e92105);
+            ).addTo(map_ea05cec060af68ee4872d67d8ef49e02);
         
     
-            var mouse_position_019ce3cba3379dbce1b6506079774555 = new L.Control.MousePosition(
+            var mouse_position_0b31e3d5474cff53b2a764963615a99f = new L.Control.MousePosition(
                 {"emptyString": "Unavailable", "lngFirst": false, "numDigits": 5, "position": "bottomright", "prefix": "", "separator": " : "}
             );
-            mouse_position_019ce3cba3379dbce1b6506079774555.options["latFormatter"] =
+            mouse_position_0b31e3d5474cff53b2a764963615a99f.options["latFormatter"] =
                 undefined;
-            mouse_position_019ce3cba3379dbce1b6506079774555.options["lngFormatter"] =
+            mouse_position_0b31e3d5474cff53b2a764963615a99f.options["lngFormatter"] =
                 undefined;
-            map_ac588439350db85da2964f3a54e92105.addControl(mouse_position_019ce3cba3379dbce1b6506079774555);
+            map_ea05cec060af68ee4872d67d8ef49e02.addControl(mouse_position_0b31e3d5474cff53b2a764963615a99f);
         
     
-            var layer_control_1761d0513611e73fba4e8d8cdf58e651 = {
+            var layer_control_2af6a4bc6fca7919b1afdbba85e9476d = {
                 base_layers : {
-                    "openstreetmap" : tile_layer_8ac35392a22600df2645a9b9affbf150,
+                    "openstreetmap" : tile_layer_65ae75f152ed4ecdb292302950a6cb3a,
                 },
                 overlays :  {
-                    "Sensores" : heat_map_0fadab9c82ba6eabe8c95bd67b0c138a,
-                    "Sensores - Imagenes" : feature_group_8b254f90589948b961580e17209e7b77,
+                    "Sensores" : heat_map_c385b570d4d5165d92400b5a81d1f471,
+                    "Sensores - Imagenes" : feature_group_18a97151505fad55d54f4f7bf2f8361e,
                 },
             };
             L.control.layers(
-                layer_control_1761d0513611e73fba4e8d8cdf58e651.base_layers,
-                layer_control_1761d0513611e73fba4e8d8cdf58e651.overlays,
+                layer_control_2af6a4bc6fca7919b1afdbba85e9476d.base_layers,
+                layer_control_2af6a4bc6fca7919b1afdbba85e9476d.overlays,
                 {"autoZIndex": true, "collapsed": true, "position": "topright"}
-            ).addTo(map_ac588439350db85da2964f3a54e92105);
-            feature_group_8b254f90589948b961580e17209e7b77.remove();
+            ).addTo(map_ea05cec060af68ee4872d67d8ef49e02);
+            feature_group_18a97151505fad55d54f4f7bf2f8361e.remove();
         
 </script>
 </html>

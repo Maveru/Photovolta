@@ -215,7 +215,7 @@ ul.mensajes {
 		{% if pfp .startswith("http") %}
 		<a href="{{pfp}}" target="_blank"><img src="{{ pfp  }}" alt="Mi foto de perfil" class="profile-picture"></a>
 		{% else %}
-		<img src="{{ url_for('static', pfp ) }}" alt="Mi foto de perfil" class="profile-picture">
+		<img src="{{ url_for('static', filename = pfp ) }}" alt="Mi foto de perfil" class="profile-picture">
 		{% endif %}
 		
 		<div class="info">

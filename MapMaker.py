@@ -17,16 +17,21 @@ from models import DatoPersona,DatoSensor,TipoMedidaEnum,SensorAUT, User
 import db
 
 from PIL import Image
-def mapear(long,latt,mensaje,texto,imagen_path,capa):
+def mapear(long,latt,valor,texto,imagen_path,capa):
 
-       
-        if mensaje > 8:
+    
+
+        if valor > 8:
             color = 'green'
-        elif mensaje > 5:
+        elif valor > 4:
             color = 'orange'
         else:
             color = 'red'
         
+
+        if valor == -1: # Para marcar los sensores
+            color = 'gray'
+
         #Depende si la imagen esta en local o es una url
         try: 
             imagen_respuesta = requests.get(imagen_path)
@@ -45,12 +50,14 @@ def mapear(long,latt,mensaje,texto,imagen_path,capa):
 
         marcador.add_to(capa)
 
+
+from Score import calcular_puntuacion_entrada
 def MakeMap():
     print(TipoMedidaEnum)
     print("Creando Mapa...")
 
     geolocator = Nominatim(user_agent="Photovolta")
-    location = geolocator.geocode("Madrid, Spain")
+    location = geolocator.geocode("Madrid, Spain", timeout=5)
     madrid_coords = [location.latitude, location.longitude]
     madrid_map = folium.Map(location=madrid_coords, zoom_start=6)
     capa_Imagenes_sensores = folium.FeatureGroup(name='Sensores - Imagenes',show=False)
@@ -70,7 +77,7 @@ def MakeMap():
         cadena_str = entrada.fecha + " " + entrada.hora
         cadena = datetime.datetime.strptime(cadena_str, '%Y-%m-%d %H:%M')
        
-        mapear(entrada.latitud,entrada.longitud,entrada.analisis,cadena_str,entrada.url,capa_Epicollect)
+        mapear(entrada.latitud,entrada.longitud,calcular_puntuacion_entrada(entrada,DatoPersona	),cadena_str,entrada.url,capa_Epicollect)
         #print(entrada.latitud)
         lista_lat_lon.append((entrada.latitud, entrada.longitud)) # Añadir los valores a la lista como una tupla
 
@@ -80,17 +87,15 @@ def MakeMap():
         if entrada.tipo_medida == TipoMedidaEnum("fotografia"):
             print("estas mapeando una imagen")
             
-            mapear(entrada.latitud, entrada.longitud,5,entrada.timestamp,entrada.valor,capa_Imagenes_sensores)
+            mapear(entrada.latitud, entrada.longitud,-1,entrada.timestamp,entrada.valor,capa_Imagenes_sensores)
         DatosSensores.append((entrada.latitud, entrada.longitud)) # Añadir los valores a la lista como una tupl
-    #mapear(long,latt,mensaje,texto,imagen_path,capa):
-
-    #input('Presione cualquier tecla para salir...')
+  
 
 
-    Mapa_Epciollect = HeatMap(data=lista_lat_lon,name = 'Usuarios', radius=10)
-    Mapa_Epciollect.add_to(madrid_map)
-   # Mapa_CSV = HeatMap(data=lista_lat_lon,name = 'Sensores', radius=10)
-   # Mapa_CSV.add_to(madrid_map)
+
+    Mapa_Epicollect = HeatMap(data=lista_lat_lon,name = 'Usuarios', radius=10)
+    Mapa_Epicollect.add_to(madrid_map)
+
     MapaImagen = HeatMap(data=DatosSensores,name = 'Sensores', radius=10)
     MapaImagen.add_to(madrid_map)
     capa_Imagenes_sensores.add_to(madrid_map)
@@ -116,7 +121,7 @@ def MakeUserMap(usuario):
     location = geolocator.geocode("Madrid, Spain")
     madrid_coords = [location.latitude, location.longitude]
     madrid_map = folium.Map(location=madrid_coords, zoom_start=5)
-    capa_Imagenes_sensores = folium.FeatureGroup(name='Sensores - Imagenes',show=False)
+    capa_Imagenes_sensores = folium.FeatureGroup(name='Imagenes',show=False)
 
    
     DatosSensores = []    
@@ -126,7 +131,7 @@ def MakeUserMap(usuario):
             if sensor.tipo_medida == TipoMedidaEnum("fotografia"):
            
                 
-                mapear(sensor.latitud, sensor.longitud,8,sensor.timestamp,sensor.valor,capa_Imagenes_sensores)
+                mapear(sensor.latitud, sensor.longitud,-1,sensor.timestamp,sensor.valor,capa_Imagenes_sensores)
             DatosSensores.append((sensor.latitud, sensor.longitud)) 
 
     mail = db.session.query(User).filter_by(username = usuario).one().email
@@ -134,10 +139,10 @@ def MakeUserMap(usuario):
     for entrada in db.session.query(DatoPersona).filter_by(username=mail).all():
         
         DatosSensores.append((entrada.latitud, entrada.longitud)) 
-        mapear(entrada.latitud,entrada.longitud,8,entrada.hora,entrada.url,capa_Imagenes_sensores)
+        mapear(entrada.latitud,entrada.longitud,calcular_puntuacion_entrada(entrada,DatoPersona),entrada.hora,entrada.url,capa_Imagenes_sensores)
     print(db.session.query(DatoPersona).filter_by(username=usuario).all())
   
-    MapaImagen = HeatMap(data=DatosSensores,name = 'Sensores', radius=10)
+    MapaImagen = HeatMap(data=DatosSensores,name = 'Mapa de Calor', radius=10)
     MapaImagen.add_to(madrid_map)
     capa_Imagenes_sensores.add_to(madrid_map)
     mouse_position = MousePosition()

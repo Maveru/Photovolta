@@ -5,82 +5,12 @@ import numpy as np
 import cv2
 import pprint
 from models import DatoPersona
+from Score import calcular_puntuacion_entrada
 
 import db
 import datetime
 #se puede borrar
 
-
-
-def detectar_cielo(imagenURL):
-    # Convertir la imagen a escala de grises
-
-
-    
-    if imagenURL.startswith('http'):
-        with urllib.request.urlopen(imagenURL) as url_response:
-            s = url_response.read()
-        arr = np.asarray(bytearray(s), dtype=np.uint8)
-        img = cv2.imdecode(arr, -1)
-    else:
-        img = cv2.imread(imagenURL, cv2.IMREAD_UNCHANGED)
-
-
-    imagen_gris = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Aplicar un umbral para obtener una imagen binaria
-    umbral = 200  # Ajusta este valor según sea necesario
-    _, imagen_binaria = cv2.threshold(imagen_gris, umbral, 255, cv2.THRESH_BINARY)
-
-    # Encontrar contornos en la imagen binaria
-    contornos, _ = cv2.findContours(imagen_binaria, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Filtrar los contornos por área para eliminar posibles falsos positivos
-    area_minima = 1000  # Ajusta este valor según sea necesario
-    contornos_filtrados = [cnt for cnt in contornos if cv2.contourArea(cnt) > area_minima]
-
-    # Devolver los contornos filtrados
-    return contornos_filtrados
-
-
-def analyze_image(imagenURL):
-    # Convertir la imagen al espacio de color HSV
-    
-    
-    if len(detectar_cielo(imagenURL)) < 2:
-        return 0
-    else:
-
-        if imagenURL.startswith('http'):
-            with urllib.request.urlopen(imagenURL) as url_response:
-                s = url_response.read()
-            arr = np.asarray(bytearray(s), dtype=np.uint8)
-            img = cv2.imdecode(arr, -1)
-        else:
-            img = cv2.imread(imagenURL, cv2.IMREAD_UNCHANGED)
-
-
-        imagen_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-        # Definir el rango de azul en el espacio de color HSV
-        rango_azul_bajo = np.array([90, 50, 50])
-        rango_azul_alto = np.array([130, 255, 255])
-
-        # Aplicar una máscara para obtener solo los píxeles azules del cielo
-        mascara = cv2.inRange(imagen_hsv, rango_azul_bajo, rango_azul_alto)
-
-        # Contar el número de píxeles azules en la máscara
-        cantidad_pixeles_azules = np.sum(mascara == 255)
-
-        # Calcular el porcentaje de píxeles azules respecto al total
-        if img is not None:
-            total_pixeles = img.shape[0] * img.shape[1]
-        else:
-            total_pixeles = 0
-        porcentaje_azul = (cantidad_pixeles_azules / total_pixeles) * 100
-
-        # Devolver el porcentaje de píxeles azules
-        return round(0.1*porcentaje_azul,2)
 
 
 def Epicollect_GetData():
@@ -132,7 +62,9 @@ def Epicollect_GetData():
         #entrada = {"Usuario":user,"Latitud":latitud,"Longitud":longitud,"Fecha":fecha,"Hora":hora,"Analisis":analyze_image(url),"url":url} 
 
         origen = "Epicollect5"
-        Dato = DatoPersona(origen,user,latitud,longitud,fecha.replace("/","-"),hora,analyze_image(url),url)
+        Dato = DatoPersona(origen,user,latitud,longitud,fecha.replace("/","-"),hora,0,url)
+
+        Dato = DatoPersona(origen,user,latitud,longitud,fecha.replace("/","-"),hora,calcular_puntuacion_entrada(Dato,DatoPersona),url)
         
     
         Database = db.session.query(DatoPersona).filter_by(url=url).first()
