@@ -1,8 +1,5 @@
 #Codigo que permite descargar datos de epicollect
 import pyepicollect as pyep
-import urllib.request
-import numpy as np
-import cv2
 import pprint
 from models import DatoPersona
 from Score import calcular_puntuacion_entrada

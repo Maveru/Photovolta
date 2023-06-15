@@ -4,7 +4,7 @@ import enum
 from sqlalchemy import Column, Integer, String, Float,ForeignKey,Enum,Table
 from sqlalchemy.orm import relationship
 
-from datetime import datetime
+
 
 
 class User(db.Base):

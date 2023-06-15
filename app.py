@@ -40,12 +40,12 @@ import string
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = claveTokens  # Clave secreta para firmar los tokens JWT -- secrets.token_hex(32)
 jwt = JWTManager(app)
-#app.secret_key = "clave_secreta" borrar
-UPLOAD_FOLDER = 'static/datosFoto/'
+
+UPLOAD_FOLDER = 'static/datosFoto/' # Para guardar las imagenes enviadas
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['PFP_UPLOAD_FOLDER'] = 'static/userpfp/'
+app.config['PFP_UPLOAD_FOLDER'] = 'static/userpfp/' #Para almacenar las imagenes de perfil
 
 
 
@@ -58,7 +58,7 @@ app.config['GOOGLE_SECRET'] = GOOGLE_SECRET
 
 Session(app)
 
-
+# Funcion para obtener el usuario actual en un objeto de la clase User
 def getUser():
     if 'username' in session:
         username = session['username']
@@ -66,12 +66,14 @@ def getUser():
         return user
     return None
 
+
+# Funcion para generar un token de autenticacion de forma aleatoria
 def registrar_sensor(id_sensor):
     token = create_access_token(identity=id_sensor)
     return token
 
-
-@app.cli.command("create_badges")
+# Se encarga de generar las insignias
+@app.cli.command("create_badges") # Este decorador permite usar la sentencia Flask create_badges desde la consola para realizar esta funcion y crear las insignias
 def create_badges():
     bronze_badge = Badge(name='Bronze Badge', image_url="badges/bronze.png", descipcion="Obtenida por conseguir 20 puntos")
     silver_badge = Badge(name='Silver Badge', image_url="badges/silver.png", descipcion="Obtenida por conseguir 50 puntos")
@@ -92,6 +94,7 @@ def create_badges():
     db.session.commit()
 
 
+# Para borrar insignias a algun usuario en caso de necesidad
 @app.cli.command("delete_badges")
 def delete_badges():
     
@@ -102,7 +105,7 @@ def delete_badges():
     db.session.commit()
     #print('Badges created successfully.')
 
-#@app.cli.command("assign_badge")
+# Se encarga de asignar las insignias a los usuarios en caso de que cumplan las condiciones
 def assign_badge(NombreInsignia,usuario):
     user = db.session.query(User).filter_by(username=usuario).first()  # Obtén el usuario al que deseas asignar la insignia
    
@@ -126,17 +129,17 @@ def assign_badge(NombreInsignia,usuario):
     db.session.commit()
     print(f'Insignia "{badge.name}" asignada al usuario "{user.username}".')
 
-
+# Test para asignar todas las insignias a un usuario
 @app.cli.command("assignAll_badges")
-def assignAll_badges():
-    user = db.session.query(User).filter_by(username="marki").first()
+#ef assignAll_badges():
+#   user = db.session.query(User).filter_by(username="marki").first()
+#
+#   badges = db.session.query(Badge).all()
+#
+#   for badge in badges:
+#       assign_badge(badge.name,user.username)
 
-    badges = db.session.query(Badge).all()
-
-    for badge in badges:
-        assign_badge(badge.name,user.username)
-
-
+# Condiciones para asignar las insignias, si se cumple hace una llamda a assign_badge y asinga la insignia al usuario
 def badge_giver(usuario):
 
     user = db.session.query(User).filter_by(username=usuario).first()
@@ -187,13 +190,7 @@ def badge_giver(usuario):
                 # Asignar la insignia al usuario, ya que la condición se cumple
                 assign_badge('Travel Badge',usuario)
                 break
-
-@app.route('/example')
-def example():
-
-    variable = variable
-
-    return render_template('ejemplo.html',variable=variable)    
+ 
 
 
 @app.route('/')  #La pagina principal.

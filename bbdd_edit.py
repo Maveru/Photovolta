@@ -1,5 +1,5 @@
 import db
-from models import DatoPersona, DatoSensor,User
+from models import DatoPersona, DatoSensor,User,SensorAUT
 
 
 #976
@@ -27,6 +27,6 @@ def LimpiarBase(Bbdd):
         db.session.commit()
     print("Base de datos limpia")    
 
-EliminarDato(DatoPersona, "origen", "Web")
+EliminarDato(SensorAUT, "id_sensor", 4001)
 #LimpiarBase(DatoPersona)
 

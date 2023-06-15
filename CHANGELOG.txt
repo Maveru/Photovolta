@@ -1,0 +1,40 @@
+Versión 02/05/2023
+
+Cambios principales:
+
+-Se permite el envio de datos a la API mediante POST
+-2 tipos diferentes de POST
+
+Cambios secundarios:
+
+-Se renombra el codigo principal a "app"
+-Mejora visual
+-Se mejora el login obligando a poner una contraseña mas segura
+
+
+03/05/2023
+
+-Se añade imagen de perfil
+-Mejora visual
+-Se permite subir datos desde la propia web
+
+06/05/2023
+
+-Modificacion BBDD
+-Zona Admin para borrar datos
+
+13/5/2023
+
+-Autenticacion sensores
+-Se puede acceder a los perfiles de
+otros usuarios desde LeaderBoards
+
+13/5/2023
+
+-Paginas dinamicas
+-Gamificacion con logros
+-Registro con google
+
+15/06/2023
+
+- Primera version definitiva para despliegue
