@@ -13,11 +13,8 @@ from flask_jwt_extended import JWTManager,create_access_token
 
 
 from claves import claveTokens, GOOGLE_ID, GOOGLE_SECRET, admin_pass
-from Score import AsignarPuntos,calcular_puntuacion_entrada
+from Score import AsignarPuntos,calcular_puntuacion_entrada,calcular_distancia
 
-from badges import haversine
-
-from PIL import Image
 
 from werkzeug.utils import secure_filename
 import os
@@ -25,7 +22,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import db
 from models import Comment,User,DatoSensor,DatoPersona,SensorAUT,Badge,UserBadge
-#from bbdd_edit import EliminarDato
+
 import uuid
 
 import json
@@ -130,7 +127,7 @@ def assign_badge(NombreInsignia,usuario):
     print(f'Insignia "{badge.name}" asignada al usuario "{user.username}".')
 
 # Test para asignar todas las insignias a un usuario
-@app.cli.command("assignAll_badges")
+#@app.cli.command("assignAll_badges")
 #ef assignAll_badges():
 #   user = db.session.query(User).filter_by(username="marki").first()
 #
@@ -184,7 +181,7 @@ def badge_giver(usuario):
             dato1 = datosUser[i]
             dato2 = datosUser[j]
 
-            distancia = haversine(dato1.latitud, dato1.longitud, dato2.latitud, dato2.longitud)
+            distancia = calcular_distancia(dato1.latitud, dato1.longitud, dato2.latitud, dato2.longitud)
 
             if distancia >= 500:
                 # Asignar la insignia al usuario, ya que la condición se cumple
